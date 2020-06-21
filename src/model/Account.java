@@ -11,7 +11,7 @@ public class Account implements Serializable {
     private AccountStatus status;
     private String password;
 
-    private Developer thisDeveloper;
+
 
 
     public Account(String accountName, String password) {

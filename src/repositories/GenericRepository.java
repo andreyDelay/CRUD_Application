@@ -1,16 +1,19 @@
 package repositories;
 
-import java.util.Set;
+
 
 public interface GenericRepository<T, ID> {
 
-    void writeData(Set<T> obj);
+    void addEntity(T obj);
 
-    Set<T> readData();
+    T getByID(ID id);
 
+    T getByName(String name);
 
-//    Set<T> initObjectsCollection();
-//
-//    void writeObjectCollection(Set<T> objectsCollection);
+    void deleteByID(ID id);
+
+    void deleteByName(String name);
+
+    void updateEntity(String name);
 
 }

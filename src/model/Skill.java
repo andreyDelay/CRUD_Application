@@ -3,19 +3,29 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Skill implements Serializable {
+
     String skillName;
     String skillDescription;
-    String privacyStrength;
+    private Long ID;
 
-    public Skill(String skillName, String skillDescription, SkillStrength ps) {
+    public Skill(String skillName, String skillDescription, Long ID) {
         this.skillName = skillName;
         this.skillDescription = skillDescription;
-        this.privacyStrength = ps.getStatus();
+        this.ID = ID;
     }
 
-    public Skill(String skillName, SkillStrength ps) {
+    public Skill(String skillName, String skillDescription) {
         this.skillName = skillName;
-        this.privacyStrength = ps.getStatus();
+        this.skillDescription = skillDescription;
+        this.ID = ID;
+    }
+
+    public Skill(String skillName, Long ID) {
+        this.skillName = skillName;
+    }
+
+    public Skill(String skillName) {
+        this.skillName = skillName;
     }
 
     public String getSkillName() {
@@ -26,29 +36,9 @@ public class Skill implements Serializable {
         return skillDescription;
     }
 
-    public String privacyStrength() {
-        return privacyStrength;
+    public void setID(Long ID) {
+        this.ID = ID;
     }
-
-    public void setPrivacyStrength(SkillStrength ps) {
-        this.privacyStrength = ps.getStatus();
-    }
-
-    enum SkillStrength {
-            LEARNING("in learning process of the skill"),
-            BEGINNER("beginning level qualification"),
-            MIDDLE("middle experience in skill"),
-            GURU("knows everything about the skill");
-
-            private String status;
-        SkillStrength(String status) {
-                this.status = status;
-            }
-
-            public String getStatus() {
-                return status;
-            }
-        }
 
     @Override
     public boolean equals(Object o) {
@@ -61,5 +51,15 @@ public class Skill implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(skillName);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("===\n");
+        builder.append("ID: ").append(ID).append("\n");
+        builder.append("skill name: ").append(skillName).append("\n");
+        builder.append("description: ").append(skillDescription).append("\n");
+        return builder.toString();
     }
 }
