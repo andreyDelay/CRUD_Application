@@ -14,6 +14,4 @@ public interface GenericRepository<T, ID> {
 
     void deleteByName(String name);
 
-    void updateEntity(String name);
-
 }

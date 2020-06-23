@@ -57,30 +57,33 @@ public class SkillsAccess implements SkillInterface {
         readLines();
         List<String> newData = skills.stream()
                 .map((a) -> a.split("-"))
-                .filter((a) -> (a != null && a.length ==2))
+                .filter((a) ->  a.length ==2)
                 .filter((arr) -> Long.parseLong(arr[0]) != id)
                 .map((arr) -> arr[0] + "-" + arr[1])
                 .collect(Collectors.toList());
         writeLines(newData);
     }
 
+    /**
+     * Удаляет навык из списка по заданному имени
+     * @param name имя навыка
+     */
     @Override
     public void deleteByName(String name) {
         readLines();
         List<String> newData = skills.stream()
                 .map((a) -> a.split("-"))
-                .filter((a) -> (a != null && a.length ==2))
+                .filter((a) -> a.length ==2)
                 .filter((arr) -> (!arr[1].equalsIgnoreCase(name)))
                 .map((arr) -> arr[0] + "-" + arr[1])
                 .collect(Collectors.toList());
         writeLines(newData);
     }
 
-    @Override
-    public void updateEntity(String name) {
-
-    }
-
+    /**
+     * Создаёт и записывает пустой лист в файл
+     * для удаления предыдущих данных
+     */
     @Override
     public void deleteAll() {
         writeLines(Arrays.asList());
@@ -102,7 +105,7 @@ public class SkillsAccess implements SkillInterface {
                                                 arr[1], //skill_name
                                                 Long.parseLong(arr[0])) //skill_ID
                                                 : null)
-                            .filter((a) -> a != null)
+                            .filter(Objects::nonNull)
                             .max(Comparator.comparing(Skill::getID));
             if (maxID.isPresent())
                 return (maxID.get().getID() + 1L);
@@ -110,6 +113,10 @@ public class SkillsAccess implements SkillInterface {
         return 1L;
     }
 
+    /**
+     * Метод считывает файл по пути @repoPath
+     * заполняет приватный список List<String></String>
+     */
     private void readLines() {
         try (Stream<String> lines = Files.lines(repoPath)) {
             skills = lines.collect(Collectors.toList());
@@ -118,6 +125,10 @@ public class SkillsAccess implements SkillInterface {
         }
     }
 
+    /**
+     * Метод записывает данные в файл
+     * @param data записывается в файл @repoPath
+     */
     private void writeLines(List<String> data) {
         byte [] bytes = data.stream().collect(Collectors.joining("\n")).getBytes();
         try {
@@ -125,7 +136,7 @@ public class SkillsAccess implements SkillInterface {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            System.out.println("Не удалось записать список навыков в файл: " + e);
+            System.out.println("Не удалось записать skills.txt: " + e);
         }
     }
 
