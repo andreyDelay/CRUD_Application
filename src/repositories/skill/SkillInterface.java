@@ -6,4 +6,5 @@ import repositories.GenericRepository;
 
 public interface SkillInterface extends GenericRepository<Skill, Long> {
 
+    void deleteAll();
 }
