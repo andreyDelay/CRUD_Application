@@ -4,24 +4,12 @@ import java.util.Objects;
 
 public class Skill implements Serializable {
 
-    String skillName;
-    String skillDescription;
+    private String skillName;
     private Long ID;
-
-    public Skill(String skillName, String skillDescription, Long ID) {
-        this.skillName = skillName;
-        this.skillDescription = skillDescription;
-        this.ID = ID;
-    }
-
-    public Skill(String skillName, String skillDescription) {
-        this.skillName = skillName;
-        this.skillDescription = skillDescription;
-        this.ID = ID;
-    }
 
     public Skill(String skillName, Long ID) {
         this.skillName = skillName;
+        this.ID = ID;
     }
 
     public Skill(String skillName) {
@@ -32,12 +20,8 @@ public class Skill implements Serializable {
         return skillName;
     }
 
-    public String getSkillDescription() {
-        return skillDescription;
-    }
-
-    public void setID(Long ID) {
-        this.ID = ID;
+    public Long getID() {
+        return ID;
     }
 
     @Override
@@ -56,10 +40,10 @@ public class Skill implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("===\n");
-        builder.append("ID: ").append(ID).append("\n");
-        builder.append("skill name: ").append(skillName).append("\n");
-        builder.append("description: ").append(skillDescription).append("\n");
+        builder.append("id: ").append(ID);
+        builder.append("\n");
+        builder.append("name: ").append(skillName);
+        builder.append("\n");
         return builder.toString();
     }
 }

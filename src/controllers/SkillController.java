@@ -1,32 +1,31 @@
 package controllers;
 
-
 import model.Skill;
 import repositories.skill.SkillsAccess;
 
-import java.util.Arrays;
-
 public class SkillController {
-    private Skill currentSkill;
+    private SkillsAccess access = new SkillsAccess();
 
-    public void addSkill(String str) {
-        String s [] = str.split("\\|");
-        System.out.println(Arrays.toString(s));
-        if (s.length > 1) {
-            currentSkill = new Skill(s[0], s[1]);
-        } else if (s.length == 1)
-            currentSkill = new Skill(s[0]);
-
-        SkillsAccess access = new SkillsAccess();
-        access.addEntity(currentSkill);
+    public String addSkill(String skillName) {
+        String tmp = skillName.trim().replaceAll("[^a-zA-Zа-яА-Я]","");
+        if (!(tmp.length() <= 2)) {
+            access = new SkillsAccess();
+            access.addEntity(new Skill(skillName));
+            return "Навык успешно добавлен";
+        }
+        return "Некорректное имя навыка";
     }
 
     public void deleteSkill(String skillName) {
-
+        access.deleteByName(skillName);
     }
 
-    public void deleteSkill(Long skillID) {
+    public void deleteAll() {
+        access.deleteAll();
+    }
 
+    public <T extends Number> void deleteSkill(T id) {
+        access.deleteByID(Long.parseLong(String.valueOf(id)));
     }
 
     public void updateSkill(String skillName) {

@@ -1,21 +1,12 @@
 package app;
 
-import model.Skill;
-import repositories.skill.SkillsAccess;
-import view.SkillV;
-
-import java.util.Scanner;
-
+import controllers.SkillController;
 
 public class Application {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        SkillV viewer = new SkillV();
-        viewer.startSkillViewer(scanner);
-        SkillsAccess access = new SkillsAccess();
-        Skill s = access.getByID(3L);
-        System.out.println(s.toString());
-
+        SkillController controller = new SkillController();
+        System.out.println(controller.addSkill("Another one"));
+//        controller.deleteSkill(3);
     }
 }
