@@ -1,7 +1,6 @@
-package repositories.account;
+package repositories.interfaces;
 
 import model.Account;
-import repositories.GenericRepository;
 
 public interface AccountInterface extends GenericRepository<Account, Long> {
 

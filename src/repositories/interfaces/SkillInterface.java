@@ -1,10 +1,8 @@
-package repositories.skill;
+package repositories.interfaces;
 
 import model.Skill;
-import repositories.GenericRepository;
 
 
 public interface SkillInterface extends GenericRepository<Skill, Long> {
 
-    void deleteAll();
 }

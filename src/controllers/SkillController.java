@@ -2,7 +2,7 @@ package controllers;
 
 import exeptions.AddSkillException;
 import model.Skill;
-import repositories.skill.SkillsAccess;
+import repositories.SkillsAccess;
 
 public class SkillController {
     private SkillsAccess access = new SkillsAccess();

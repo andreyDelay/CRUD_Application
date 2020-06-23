@@ -1,4 +1,4 @@
-package repositories.deceloper;
+package repositories;
 
 public class DevelopersAccess {
 
