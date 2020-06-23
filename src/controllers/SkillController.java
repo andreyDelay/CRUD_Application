@@ -1,12 +1,13 @@
 package controllers;
 
+import exeptions.AddSkillException;
 import model.Skill;
 import repositories.skill.SkillsAccess;
 
 public class SkillController {
     private SkillsAccess access = new SkillsAccess();
 
-    public String addSkill(String skillName) {
+    public String addSkill(String skillName) throws AddSkillException {
         String tmp = skillName.trim().replaceAll("[^a-zA-Zа-яА-Я]","");
         if (!(tmp.length() <= 2)) {
             access = new SkillsAccess();
@@ -26,14 +27,6 @@ public class SkillController {
 
     public <T extends Number> void deleteSkill(T id) {
         access.deleteByID(Long.parseLong(String.valueOf(id)));
-    }
-
-    public void updateSkill(String skillName) {
-
-    }
-
-    public void updateSkill(Long ID) {
-
     }
 
 }
