@@ -1,5 +1,6 @@
 package repositories;
 
+import exeptions.SkillException;
 import model.Skill;
 import repositories.interfaces.SkillInterface;
 
@@ -9,7 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SkillsAccess implements SkillInterface {
 
@@ -31,7 +34,7 @@ public class SkillsAccess implements SkillInterface {
      * Конструктор призван для инициализации списка всех объектов их файла repoPath в private List<Skill>
      * @throws IOException - пробрасывает исключение из метода readFile() если не удалось прочитать данные
      */
-    public SkillsAccess() throws IOException {
+    public SkillsAccess() throws SkillException {
         readFile();
     }
 
@@ -43,9 +46,10 @@ public class SkillsAccess implements SkillInterface {
      * по пути repoPath
      */
     @Override
-    public boolean save(Skill obj) throws IOException {
+    public boolean save(Skill obj) throws SkillException {
         Long incrementedID = generateID();
         skills.add(new Skill(obj.getSkillName(), incrementedID));
+
         return writeFile(skills);
     }
 
@@ -59,7 +63,7 @@ public class SkillsAccess implements SkillInterface {
     public Optional<Skill> find(Long id) {
         return
                 skills.stream()
-                .filter(skill -> skill.getID() == id)
+                .filter(skill -> skill.getID().equals(id))
                 .findFirst();
     }
 
@@ -71,29 +75,35 @@ public class SkillsAccess implements SkillInterface {
      * @throws IOException - если не удалось записать новые данные в файл repoPath
      */
     @Override
-    public boolean delete(Long id) throws IOException {
-        Optional<Skill> foundSkill = skills.stream().filter(skill -> skill.getID() == id).findFirst();
+    public boolean delete(Long id) throws SkillException {
+        Optional<Skill> foundSkill = skills.stream()
+                                            .filter(skill -> skill.getID().equals(id))
+                                            .findFirst();
         if (!foundSkill.isPresent()) return false;
         skills = skills.stream()
-                .filter(skill -> skill.getID() != id)
+                .filter(skill -> !skill.getID().equals(id))
                 .collect(Collectors.toList());
+
+        return writeFile(skills);
+    }
+
+
+    @Override
+    public boolean saveAll(List<Skill> list) throws SkillException {
+        for (Skill skill : list)
+            save(skill);
+
         return writeFile(skills);
     }
 
     @Override
-    public List<Skill> findAll() throws IOException {
-        readFile();
-        return null;
-    }
+    public boolean update(Long id, Skill newObj) throws SkillException {
+      skills = skills.stream()
+                .filter(skill -> skill.getID().equals(id))
+                .map(oldSkill -> new Skill(newObj.getSkillName(), id))
+                .collect(Collectors.toList());
 
-    @Override
-    public boolean saveAll(List<Skill> list) throws IOException {
-        return false;
-    }
-
-    @Override
-    public boolean update(Long aLong) throws IOException {
-        return false;
+        return writeFile(skills);
     }
 
     /**
@@ -102,12 +112,14 @@ public class SkillsAccess implements SkillInterface {
      * @return HashNap<ID, Skill>
      */
     @Override
-    public Map<Long, Skill> mapOfAll() {
-        return skills.stream()
-                .collect(Collectors.toMap(
-                        Skill::getID,
-                        skill -> skill,
-                        (name1, name2) -> name2,HashMap::new));
+    public Map<Long, Skill> findAll() {
+        Map<Long, Skill> allSkills = skills.stream()
+                                        .collect(Collectors.toMap(
+                                        Skill::getID,
+                                        Function.identity(),
+                                        (name1, name2) -> name2,
+                                        HashMap::new));
+        return allSkills;
     }
 
     /**
@@ -130,11 +142,15 @@ public class SkillsAccess implements SkillInterface {
      * считывает файл по пути @repoPath преобразует считанные строки в List<Skill>
      * заполняет приватный список List<Skill>
      */
-    private void readFile() throws IOException {
-            skills = Files.lines(repoPath)
-                    .map(this::skillMapper)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+    private void readFile() throws SkillException{
+        try(Stream<String> stream = Files.lines(repoPath))
+        {
+            skills = stream.map(this::skillMapper)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new SkillException(e.getMessage());
+        }
     }
 
     /**
@@ -142,17 +158,21 @@ public class SkillsAccess implements SkillInterface {
      * при ином случае генерирует исключение типа IOException
      * @param data List<String> содержащий строковые представления объектов типа Skill
      */
-    private boolean writeFile(List<Skill> data) throws IOException {
+    private boolean writeFile(List<Skill> data) throws SkillException {
             byte [] bytes =
                             data.stream()
                             .map(this::skillToFileFormat)
                             .collect(Collectors.joining("\n"))
                             .getBytes();
+            try {
+                Files.write(repoPath, bytes,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                throw new SkillException(e.getMessage());
+            }
 
-            Files.write(repoPath, bytes,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
-            return true;
+        return true;
     }
 
     /**
@@ -164,7 +184,9 @@ public class SkillsAccess implements SkillInterface {
     private Skill skillMapper(String line) {
         String [] tmp = line.split(separator);
         if (tmp.length != 2) return null;
+
         long currentID = Long.parseLong(tmp[0]);
+
         return new Skill(tmp[1], currentID);
     }
 
@@ -176,10 +198,12 @@ public class SkillsAccess implements SkillInterface {
      */
     private String skillToFileFormat(Skill skill) {
         StringBuilder stringSkillRepresentation = new StringBuilder();
+
         stringSkillRepresentation
                                 .append(skill.getID())
                                 .append(separator)
                                 .append(skill.getSkillName());
+
         return stringSkillRepresentation.toString();
     }
 

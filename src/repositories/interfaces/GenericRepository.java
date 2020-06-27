@@ -1,25 +1,22 @@
 package repositories.interfaces;
 
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface GenericRepository<T, ID> {
 
-    boolean save(T obj) throws IOException;
+    boolean save(T obj) throws Exception;
 
     Optional<T> find(ID id);
 
-    List<T> findAll() throws IOException;
+    Map<ID,T> findAll();
 
-    boolean saveAll(List<T> list) throws IOException;
+    boolean saveAll(List<T> list) throws Exception;
 
-    boolean update(ID id) throws IOException;
+    boolean update(ID id, T obj) throws Exception;
 
-    boolean delete(ID id) throws IOException;
-
-    Map<ID,T> mapOfAll();
+    boolean delete(ID id) throws Exception;
 
 }

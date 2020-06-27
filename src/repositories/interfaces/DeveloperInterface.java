@@ -1,7 +1,9 @@
 package repositories.interfaces;
 
 
-public interface DeveloperInterface {
+import model.Developer;
+
+public interface DeveloperInterface extends GenericRepository<Developer, Long> {
 
 }
 

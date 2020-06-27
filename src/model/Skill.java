@@ -7,7 +7,8 @@ public class Skill implements Serializable {
     private String skillName;
     private Long ID;
 
-    public Skill(String skillName, Long ID) {
+    public Skill(String skillName, Long ID)
+    {
         this.skillName = skillName;
         this.ID = ID;
     }
@@ -15,11 +16,9 @@ public class Skill implements Serializable {
     public Skill(String skillName) {
         this.skillName = skillName;
     }
-
     public String getSkillName() {
         return skillName;
     }
-
     public Long getID() {
         return ID;
     }
@@ -41,9 +40,9 @@ public class Skill implements Serializable {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("id: ").append(ID);
-        builder.append("\n");
+        builder.append(", ");
         builder.append("name: ").append(skillName);
-        builder.append("\n");
+        builder.append(";");
         return builder.toString();
     }
 }
