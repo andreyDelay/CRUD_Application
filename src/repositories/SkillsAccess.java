@@ -32,7 +32,7 @@ public class SkillsAccess implements SkillInterface {
 
     /**
      * Конструктор призван для инициализации списка всех объектов их файла repoPath в private List<Skill>
-     * @throws IOException - пробрасывает исключение из метода readFile() если не удалось прочитать данные
+     * @throws SkillException - пробрасывает исключение из метода readFile() если не удалось прочитать данные
      */
     public SkillsAccess() throws SkillException {
         readFile();
@@ -42,7 +42,7 @@ public class SkillsAccess implements SkillInterface {
      * Метод добавляет в ремозиторий новый объект типа Skill
      * @param obj - переданный от пользователя новый объект Skill
      * @return возвращает true если удалось записать в файл коллекцию объектов с вновь добавленным obj
-     * @throws IOException пробрасывает исключение из метода writeFile если не удалось сохранить данные в файле
+     * @throws SkillException - пробрасывает исключение из метода writeFile если не удалось сохранить данные в файле
      * по пути repoPath
      */
     @Override
@@ -72,7 +72,7 @@ public class SkillsAccess implements SkillInterface {
      * после чего данные записываются непосредственно в файл repoPath
      * @param id - идентификатор для поиска объекта
      * @return - true если удалось найти и удалить объект
-     * @throws IOException - если не удалось записать новые данные в файл repoPath
+     * @throws SkillException - если не удалось записать новые данные в файл repoPath
      */
     @Override
     public boolean delete(Long id) throws SkillException {
@@ -87,7 +87,12 @@ public class SkillsAccess implements SkillInterface {
         return writeFile(skills);
     }
 
-
+    /**
+     * Метод сохраняет все навыки в репозитории
+     * @param list - список навыков
+     * @return - true если сохранение прошло успешно
+     * @throws SkillException - если не удалось сохранить данные
+     */
     @Override
     public boolean saveAll(List<Skill> list) throws SkillException {
         for (Skill skill : list)
@@ -96,12 +101,19 @@ public class SkillsAccess implements SkillInterface {
         return writeFile(skills);
     }
 
+    /**
+     * Метод обновляет имя навыка по указаному id
+     * @param id -идентификатор навыка, который необходимо изменить
+     * @param newObj - новые данные
+     * @return - true если изменения сделаны и сохранены
+     * @throws SkillException - если не удалось сохранить изменения
+     */
     @Override
     public boolean update(Long id, Skill newObj) throws SkillException {
       skills = skills.stream()
-                .filter(skill -> skill.getID().equals(id))
-                .map(oldSkill -> new Skill(newObj.getSkillName(), id))
-                .collect(Collectors.toList());
+                    .filter(skill -> skill.getID().equals(id))
+                    .map(oldSkill -> new Skill(newObj.getSkillName(), id))
+                    .collect(Collectors.toList());
 
         return writeFile(skills);
     }

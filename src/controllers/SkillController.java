@@ -33,6 +33,10 @@ public class SkillController {
         }
     }
 
+    public Map<Long, Skill> skills() {
+        return access.findAll();
+    }
+
     /**
      * Метод преобразует строку в новый объект типа Skill
      * если не получилось добавить новый объект в ремозиторий, то метод возвращает строку

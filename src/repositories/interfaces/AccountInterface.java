@@ -1,7 +1,12 @@
 package repositories.interfaces;
 
-import model.Account;
 
-public interface AccountInterface extends GenericRepository<Account, Long> {
+import exeptions.AddAccountException;
+
+public interface AccountInterface<T> {
+
+    boolean findAccount(String accName) throws AddAccountException;
+
+    boolean saveAccount(T account) throws AddAccountException;
 
 }

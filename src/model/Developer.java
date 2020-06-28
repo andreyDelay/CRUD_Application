@@ -9,32 +9,38 @@ public class Developer implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
-    private String dateOfBirth;
     private int age;
 
     private Set<Skill> skills;
     private Account account;
-    private String accountName;
 
-    public Developer(
-            Long id, String firstName, String lastName, String dateOfBirth, int age, String accountName)
+    public Developer(Long id,String firstName,String lastName, int age, Account account)
     {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
         this.age = age;
-        this.accountName = accountName;
-//        account = new Account(accountName);
+        this.account = account;
     }
 
-    public Developer(Long id, String firstName, int age, String accountName)
+    public Developer(String firstName,String lastName, int age, Account account)
     {
-        this.id = id;
         this.firstName = firstName;
+        this.lastName = lastName;
         this.age = age;
-        this.accountName = accountName;
-//        account = new Account(accountName);
+        this.account = account;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -49,16 +55,16 @@ public class Developer implements Serializable {
         return lastName;
     }
 
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
-
     public int getAge() {
         return age;
     }
 
     public Set<Skill> getSkills() {
         return skills;
+    }
+
+    public void setSkills(Set<Skill> skills) {
+        this.skills = skills;
     }
 
     public Account getAccount() {
@@ -72,22 +78,28 @@ public class Developer implements Serializable {
         Developer developer = (Developer) o;
         return age == developer.age &&
                 id.equals(developer.id) &&
-                firstName.equals(developer.firstName) &&
-                accountName.equals(developer.accountName);
+                firstName.equals(developer.firstName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, age, accountName);
+        return Objects.hash(id, firstName, age);
     }
 
     @Override
     public String toString() {
-        return "Developer:\n" +
-                "id: " + id + "\n" +
-                "firstName: " + firstName + "\n" +
+        StringBuilder builder = new StringBuilder();
+        for(Skill s: skills) {
+            builder.append("id: ")
+                    .append(s.getID())
+                    .append(", name: ")
+                    .append(s.getSkillName())
+                    .append("\n");
+        }
+        return
+                "first name: " + firstName + "\n" +
+                "last name: " + lastName + "\n" +
                 "age: " + age + "\n" +
-                "accountName: " + accountName + "\n" +
-                "skills: \n" + skills;
+                "skills: " + "\n" + builder.toString();
     }
 }

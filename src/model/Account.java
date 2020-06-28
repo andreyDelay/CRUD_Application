@@ -12,8 +12,6 @@ public class Account implements Serializable {
     private String password;
 
 
-
-
     public Account(String accountName, String password) {
         this.password = password;
         this.accountName = accountName;
@@ -21,9 +19,12 @@ public class Account implements Serializable {
         dateOFRegistration = Calendar.getInstance().getTime().toString();
     }
 
-    public boolean comparePasswords(String password) {
-        return this.password.equals(password);
+    public Account(String accountName) {
+        this.accountName = accountName;
+        status = AccountStatus.ACTIVE;
+        dateOFRegistration = Calendar.getInstance().getTime().toString();
     }
+
 
     public String getAccountName() {
         return accountName;

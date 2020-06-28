@@ -1,91 +1,78 @@
-//package repositories.account;
-//import model.Account;
-//
-//import java.io.*;
-//import java.nio.file.*;
-//import java.nio.file.attribute.BasicFileAttributes;
-//import java.util.HashSet;
-//import java.util.Set;
-//
-//public class AccountsAccess implements AccountInterface {
-//    private Path filepath = Paths.get("src\\resources\\accounts.txt");
-//
-//    @Override
-//    public Set<Account> readData() {
-//        checkTheFile(filepath);
-//            try (
-//                    ObjectInputStream is =
-//                         new ObjectInputStream(
-//                                 new FileInputStream("src\\resources\\accounts.txt")))
-//            {
-//               Set<Account> allAccounts = (Set<Account>) is.readObject();
-//               return allAccounts;
-//
-//            } catch (IOException e) {
-//                System.out.println
-//                        ("Ошибка при чтении файла в классе " + this.getClass().getName() + " : " + e);
-//            } catch (ClassNotFoundException e) {
-//                System.out.println
-//                        ("Не удалось инициализировать класс при чтении из файла в классе "
-//                                + this.getClass().getName() + " : " + e);
-//            }
-//        return null;
-//    }
-//
-//
-//    @Override
-//    public void writeData(Set<Account> objectsCollection) {
-//        try (
-//                ObjectOutputStream os =
-//                        new ObjectOutputStream(
-//                                new FileOutputStream("src\\resources\\accounts.txt")))
-//        {
-//
-//            os.writeObject(objectsCollection);
-//
-//        } catch (IOException e) {
-//            System.out.println
-//                    ("Ошибка при записи в файл в классе " + this.getClass().getName() + " : " + e);
-//        }
-//    }
-//
-//    private void checkTheFile(Path filepath) {
-//        if (!Files.exists(filepath)) {
-//            createFile(filepath);
-//        } else {
-//            try {
-//                BasicFileAttributes attributes = Files.readAttributes(filepath, BasicFileAttributes.class);
-//                if (attributes.size() < 50.0) {
-//                    Files.delete(filepath);
-//                    createFile(filepath);
-//                } else {
-//                    return;
-//                }
-//            } catch (IOException e) {
-//                System.out.println("Ошибка чтения атрибутов в классе " + this.getClass().getName()
-//                + ", в методе checkTheFile(): " + e);
-//            }
-//        }
-//    }
-//
-//    private void createFile(Path filepath) {
-//        try (
-//                ObjectOutputStream outputStream =
-//                        new ObjectOutputStream(
-//                                Files.newOutputStream(filepath,
-//                                        StandardOpenOption.CREATE_NEW,
-//                                        StandardOpenOption.WRITE))
-//        )
-//        {
-//
-//            Set<Account> emptySet = new HashSet<>();
-//            outputStream.writeObject(emptySet);
-//
-//        } catch (InvalidPathException e) {
-//            System.out.println("Ошибка в указании пути: " + e);
-//            ;
-//        } catch (IOException e) {
-//            System.out.println("Ошибка ввода-вывода: " + e);
-//        }
-//    }
-//}
+package repositories;
+
+import exeptions.AddAccountException;
+import model.Account;
+import repositories.interfaces.AccountInterface;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.stream.Stream;
+
+public class AccountsAccess implements AccountInterface<Account> {
+    /**
+     * Путь к файлу
+     */
+    private Path repoPath = Paths.get("src\\resources\\accounts.txt");
+    /**
+     * Текущий аккаунт
+     */
+    private Account account;
+    /**
+     * Имя аккаунта под которым необходимо выполнить вход
+     */
+    private String accountName;
+
+    @Override
+    public boolean findAccount(String accName) throws AddAccountException {
+        accountName = accName;
+        readFile();
+        return account != null;
+    }
+
+    /**
+     * Метод сохраняет текущий аккаунт в репозитории
+     * @param account - объект типа Account, который необходимо сохранить
+     * @return - true если сохранение прошло успешно
+     * @throws AddAccountException - если не удалось сохранить данные
+     */
+    @Override
+    public boolean saveAccount(Account account) throws AddAccountException {
+        return writeFile(account.getAccountName());
+    }
+
+    /**
+     * Метод считывает данные из файла
+     * @throws AddAccountException - если не удалось прочитать файл
+     */
+    private void readFile() throws AddAccountException {
+        try (Stream<String> stream = Files.lines(repoPath)){
+                stream.filter(line -> line.equals(accountName))
+                .map(Account::new)
+                .findFirst()
+                .ifPresent(value -> account = value);
+        } catch (IOException e) {
+            throw new AddAccountException(e.getMessage());
+        }
+    }
+
+    /**
+     * Метод записывает данные в файл
+     * @param newAcc - данные которые необходимо записать
+     * @return - true если запись в файл прошла успешно
+     * @throws AddAccountException - если не удалось записать данные
+     */
+    private boolean writeFile(String newAcc) throws AddAccountException {
+        byte [] bytes = newAcc.getBytes();
+        try {
+            Files.write(repoPath, bytes,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            throw new AddAccountException(e.getMessage());
+        }
+        return true;
+    }
+}
