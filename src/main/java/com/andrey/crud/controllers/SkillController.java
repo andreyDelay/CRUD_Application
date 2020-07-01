@@ -1,37 +1,16 @@
-package controllers;
+package com.andrey.crud.controllers;
 
-import exeptions.SkillException;
-import model.Skill;
-import repositories.SkillsAccess;
+
+
+import com.andrey.crud.repository.IO.SkillsRepository;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SkillController {
-    /**
-     * Поле для хранения всех данных по навыкам
-     * после инициализации текущего обекта
-     */
-    private SkillsAccess access;
 
-    /**
-     * Отображение для хранения списка навыков в виде ключ(Long) - значение(Skill)
-     */
-    private Map<Long, Skill> skillsList;
-
-    /**
-     * Контроллер для инициализации полей данных
-     */
-    public SkillController() {
-        try {
-            access = new SkillsAccess();
-            skillsList = access.findAll();
-        } catch (SkillException e) {
-            System.out.println("Не удалось получить данные из файла." + e.getMessage());
-        }
-    }
+    private SkillsRepository repository = new SkillsRepository();
 
     public Map<Long, Skill> skills() {
         return access.findAll();

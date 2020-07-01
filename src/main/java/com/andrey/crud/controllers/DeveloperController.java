@@ -1,72 +1,35 @@
-package controllers;
+package com.andrey.crud.controllers;
 
-import exeptions.AddDeveloperException;
-import model.Developer;
-import model.Skill;
-import repositories.DevelopersAccess;
+import com.andrey.crud.exeptions.ReadFileException;
+import com.andrey.crud.model.Developer;
+import com.andrey.crud.repository.IO.DeveloperRepository;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 
 public class DeveloperController {
-    /**
-     * Поле для хранения класса контроллер
-     */
-    private DevelopersAccess access;
-    /**
-     * Поле для хранения класса SkillController
-     * для работы с объектами данных типа Skill
-     */
-    private SkillController controller;
-    /**
-     * Текущий Developer для которого был выполнен вход в систему
-     */
-    private Developer currentDeveloper;
 
-    public DeveloperController(String accountName) {
-        try {
-            access = new DevelopersAccess(accountName);
-        } catch (AddDeveloperException e) {
-            System.out.println("Не удалось войти в систему");
-        }
-    }
+    private DeveloperRepository repository = new DeveloperRepository();
 
-    /**
-     * Метод отображает данные о текущем пользователе
-     * @return - строковое представление пользователя
-     */
-    public String showCurrentDeveloper() {
-        if (controller == null)
-            controller = new SkillController();
-
-        Set<Skill> allSkills =controller.skills()
-                                        .entrySet()
-                                        .stream()
-                                        .map(Map.Entry::getValue)
-                                        .collect(Collectors.toSet());
-
-        Map<Long, Developer> devS = access.findAll();
-        Optional<Developer> result = devS.entrySet().stream()
-                                    .map(Map.Entry::getValue)
+    private Developer current;
+    //TODO определиться что делать с исключением
+    public Developer find(String name) throws ReadFileException {
+        Map<Long,Developer> developers = findAll();
+        Optional<Developer> required = developers.values().stream()
+                                    .filter(object -> object.getFirstName().equalsIgnoreCase(name))
                                     .findFirst();
-        if (result.isPresent()) {
-            currentDeveloper = result.get();
-            currentDeveloper.setSkills(allSkills);
-            return currentDeveloper.toString();
-        }
-
-        return "Не удалось найти данные для этого аккаунта";
+        return required.orElse(null);
     }
 
-    /**
-     * Метод изменяет имя пользователя и сохраняет данные
-     * в репозитории
-     * @param newName - новое имя пользователя
-     * @return - строковый результат работы метода
-     */
+    public Developer find(Long id) throws ReadFileException {
+        Optional<Developer> result = repository.find(id);
+        return result.orElse(null);
+    }
+
+    public Map<Long,Developer> findAll() throws ReadFileException {
+        return repository.findAll();
+    }
+
     public String updateName(String newName) {
         if (!checkDevName(newName))
             return "Некорректное имя";
@@ -134,6 +97,16 @@ public class DeveloperController {
         String [] checkNames = names.split(",");
         if (checkNames.length != 2) return "Некорректные данные";
         return controller.updateSkill(checkNames[0], checkNames[1]);
+    }
+
+    private void fillWithSkills(Developer developer) {
+        SkillController skillController = new SkillController();
+        //TODO
+    }
+
+    private void fillWithSkills(Map<Long,Developer> developers) {
+        SkillController skillController = new SkillController();
+        //TODO
     }
 
     /**

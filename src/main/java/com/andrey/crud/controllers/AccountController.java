@@ -1,20 +1,20 @@
-package controllers;
+package com.andrey.crud.controllers;
 
 
-import exeptions.AddAccountException;
-import model.Account;
-import repositories.AccountsAccess;
+import com.andrey.crud.model.Account;
+import com.andrey.crud.repository.IO.AccountRepository;
 
 public class AccountController {
-
-    private AccountsAccess access = new AccountsAccess();
-
-    public String checkAccountInRepo(String accountName) {
+    
+    private Account current;
+    AccountRepository repository = new AccountRepository();
+    
+    public String find(String accountName) {
         if (!checkAccountName(accountName))
             return "Некорректное имя аккаунта";
 
         try {
-            if (access.findAccount(accountName))
+            if (repository.findAccount(accountName))
                     return "Вход выполнен";
         } catch (AddAccountException e) {
             System.out.println("Не удалось прочитать базу данных." + e.getMessage());
@@ -27,7 +27,7 @@ public class AccountController {
             return "Некорректное имя аккаунта";
 
         try {
-            access.saveAccount(new Account(accountName));
+            repository.saveAccount(new Account(accountName));
         } catch (AddAccountException e) {
             System.out.println("Не озранить аккаунт в базу данных." + e.getMessage());
         }

@@ -1,16 +1,15 @@
-package model;
-import java.io.Serializable;
+package com.andrey.crud.model;
 import java.util.Objects;
 
-public class Skill implements Serializable {
+public class Skill {
 
     private String skillName;
-    private Long ID;
+    private Long id;
 
-    public Skill(String skillName, Long ID)
+    public Skill(Long ID, String skillName)
     {
         this.skillName = skillName;
-        this.ID = ID;
+        this.id = ID;
     }
 
     public Skill(String skillName) {
@@ -19,8 +18,14 @@ public class Skill implements Serializable {
     public String getSkillName() {
         return skillName;
     }
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
+    }
+    public void setID(Long ID) {
+        this.id = ID;
+    }
     public Long getID() {
-        return ID;
+        return id;
     }
 
     @Override
@@ -39,7 +44,7 @@ public class Skill implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("id: ").append(ID);
+        builder.append("id: ").append(id);
         builder.append(", ");
         builder.append("name: ").append(skillName);
         builder.append(";");

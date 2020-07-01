@@ -1,2 +1,2 @@
-1---write Java code
-2---write readmi.md file
+1/write Java code/do/be
+2/write readmi.md file

@@ -1,4 +1,4 @@
-package exeptions;
+package com.andrey.crud.exeptions;
 
 public class AddDeveloperException extends Exception {
 

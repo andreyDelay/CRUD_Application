@@ -1,10 +1,9 @@
-package model;
+package com.andrey.crud.model;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
-public class Developer implements Serializable {
+public class Developer {
 
     private Long id;
     private String firstName;
@@ -14,29 +13,32 @@ public class Developer implements Serializable {
     private Set<Skill> skills;
     private Account account;
 
-    public Developer(Long id,String firstName,String lastName, int age, Account account)
+    public Developer(Long id,String firstName,String lastName, int age)
     {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.account = account;
     }
 
-    public Developer(String firstName,String lastName, int age, Account account)
+    public Developer(String firstName,String lastName, int age)
     {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.account = account;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public void setId(Long id) {
@@ -46,29 +48,24 @@ public class Developer implements Serializable {
     public Long getId() {
         return id;
     }
-
     public String getFirstName() {
         return firstName;
     }
-
     public String getLastName() {
         return lastName;
     }
-
     public int getAge() {
         return age;
+    }
+    public Account getAccount() {
+        return account;
     }
 
     public Set<Skill> getSkills() {
         return skills;
     }
-
     public void setSkills(Set<Skill> skills) {
         this.skills = skills;
-    }
-
-    public Account getAccount() {
-        return account;
     }
 
     @Override

@@ -1,49 +1,40 @@
-package model;
-import java.io.Serializable;
-import java.util.Calendar;
+package com.andrey.crud.model;
 import java.util.Objects;
 
-public class Account implements Serializable {
+public class Account {
 
     private Long id;
     private String accountName;
-    private String dateOFRegistration;
     private AccountStatus status;
-    private String password;
 
-
-    public Account(String accountName, String password) {
-        this.password = password;
+    public Account(Long id, String accountName, AccountStatus status) {
         this.accountName = accountName;
-        status = AccountStatus.ACTIVE;
-        dateOFRegistration = Calendar.getInstance().getTime().toString();
+        this.id = id;
+        this.status = status;
     }
 
     public Account(String accountName) {
         this.accountName = accountName;
         status = AccountStatus.ACTIVE;
-        dateOFRegistration = Calendar.getInstance().getTime().toString();
     }
-
 
     public String getAccountName() {
         return accountName;
     }
-
-    public String getDateOFRegistration() {
-        return dateOFRegistration;
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
-
     public AccountStatus getStatus() {
         return status;
     }
-
     public void setStatus(AccountStatus status) {
         this.status = status;
     }
-
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
