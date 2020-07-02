@@ -49,4 +49,14 @@ public class Account {
     public int hashCode() {
         return Objects.hash(accountName);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder account = new StringBuilder();
+        account.append("account id: ").append(this.getId()).append("; ")
+                .append("name: ").append(this.getAccountName()).append("; ")
+                .append("status: ").append(this.getStatus().toString());
+
+        return account.toString();
+    }
 }

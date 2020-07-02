@@ -1,1 +1,10 @@
-1/admin/ACTIVE
+{
+	id:=1
+	name:=admin
+	status:=ACTIVE
+}
+{
+	id:=2
+	name:=welder
+	status:=ACTIVE
+}

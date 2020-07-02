@@ -14,11 +14,11 @@ public interface GenericRepository<T, ID> {
 
     Optional<T> find(ID id) throws ReadFileException;
 
-    List<T> findAll() throws ReadFileException;
+    Map<ID,T> findAll() throws ReadFileException;
 
     boolean saveAll(List<T> list) throws WriteFileException;
 
-    boolean update(ID id,T oldValue, T newValue) throws ReadFileException, WriteFileException;
+    boolean update(ID id, T newValue) throws ReadFileException, WriteFileException;
 
     boolean delete(ID id) throws ReadFileException, WriteFileException;
 

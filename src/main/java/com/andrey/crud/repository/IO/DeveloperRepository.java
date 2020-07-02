@@ -3,6 +3,7 @@ package com.andrey.crud.repository.IO;
 import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
 import com.andrey.crud.model.Developer;
+import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.DeveloperIORepository;
 import com.andrey.crud.utils.IOUtils;
 
@@ -17,7 +18,7 @@ public class DeveloperRepository implements DeveloperIORepository {
 
     private final Path filepath = Paths.get("src\\resources\\developers.txt");
 
-    private final String separator = ",";
+    private final String separator = "=";
 
     @Override
     public boolean save(Developer obj) throws WriteFileException, ReadFileException {
@@ -40,19 +41,32 @@ public class DeveloperRepository implements DeveloperIORepository {
     @Override
     public Map<Long, Developer> findAll() throws ReadFileException {
         List<String> fromRepository = IOUtils.readFile(filepath);
-        Map<Long, Developer> developers = fromRepository.stream()
-                                                        .filter(row -> row.length() > 5)
-                                                        .map(row -> row.split(","))
-                                                        .map(array -> new Developer(
-                                                                Long.parseLong(array[0]),
-                                                                array[1],
-                                                                array[2],
-                                                                Integer.parseInt(array[3])))
-                                                        .collect(Collectors.toMap(
-                                                                Developer::getId,
-                                                                Function.identity(),
-                                                                (dev1,dev2) -> dev1,
-                                                                HashMap::new));
+        Iterator<String> rows = fromRepository.iterator();
+        List<Developer> list = new ArrayList<>();
+            while (rows.hasNext()) {
+                String current = rows.next();
+                if (current.equals("{")) {
+                    String [][] tmp = new String[5][2];
+                    int cnt = 0;
+                    current = rows.next().trim();
+                    while (!current.equals("}")){
+                        tmp[cnt++] = current.split("=");
+                        current = rows.next().trim();
+                    }
+                    list.add(new Developer(
+                                            Long.parseLong(tmp[0][1]),
+                                            tmp[1][1],
+                                            tmp[2][1],
+                                            Integer.parseInt(tmp[3][1]),
+                                            tmp[4][1]));
+                }
+            }
+        Map<Long,Developer> developers = list.stream()
+                                            .collect(Collectors.toMap(
+                                            Developer::getId,
+                                            Function.identity(),
+                                            (dev1,dev2) -> dev1,
+                                            HashMap::new));
         return developers;
     }
 
@@ -68,10 +82,10 @@ public class DeveloperRepository implements DeveloperIORepository {
     @Override
     public boolean update(Long id, Developer obj) throws ReadFileException, WriteFileException {
         Map<Long, Developer> developers = findAll();
-        developers.values().stream()
-                                .filter(value -> value.getId().equals(id))
-                                .peek(value -> value = obj);
-        //TODO проверить меняется ли объект в мапе после обработки в стриме
+        for(Map.Entry<Long,Developer> entry: developers.entrySet()) {
+            if (entry.getKey().equals(id))
+                entry.setValue(obj);
+        }
         String dataToWrite = developers.values().stream()
                                                 .map(this::objectToRepositoryFormat)
                                                 .collect(Collectors.joining("\n"));
@@ -93,15 +107,31 @@ public class DeveloperRepository implements DeveloperIORepository {
     }
 
     private String objectToRepositoryFormat(Developer object) {
+        Set<Skill> skills = object.getSkills();
+
+        StringBuilder sk = new StringBuilder();
+        if (skills != null) {
+            for (Skill s : skills)
+                sk.append(s.getID()).append(",");
+            sk.delete(sk.length() - 1, sk.length());
+        } else {
+            sk.append("\"\"");
+        }
+
         StringBuilder dataToWrite = new StringBuilder();
                     dataToWrite.append("{")
                     .append("\n")
                     .append("\t")
-                    .append(object.getId()).append(",")
-                    .append(object.getFirstName()).append(",")
-                    .append(object.getLastName()).append(",")
-                    .append(object.getAge())
-                    .append("\n").append("}\n");
+                    .append("id:=").append(object.getId()).append("\n")
+                    .append("\t")
+                    .append("firstName:=").append(object.getFirstName()).append("\n")
+                    .append("\t")
+                    .append("lastName:=").append(object.getLastName()).append("\n")
+                    .append("\t")
+                    .append("age:=").append(object.getAge()).append("\n")
+                    .append("\t")
+                    .append("skills:=").append(sk.toString()).append("\n")
+                    .append("}\n");
         return dataToWrite.toString();
     }
 }

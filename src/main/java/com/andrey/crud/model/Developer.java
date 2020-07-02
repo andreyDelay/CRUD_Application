@@ -1,5 +1,6 @@
 package com.andrey.crud.model;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -10,15 +11,18 @@ public class Developer {
     private String lastName;
     private int age;
 
-    private Set<Skill> skills;
+    private String numbersOfSkills;
+
+    private Set<Skill> skills = new HashSet<>();
     private Account account;
 
-    public Developer(Long id,String firstName,String lastName, int age)
+    public Developer(Long id,String firstName,String lastName, int age, String numbersOfSkills)
     {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.numbersOfSkills = numbersOfSkills;
     }
 
     public Developer(String firstName,String lastName, int age)
@@ -28,6 +32,12 @@ public class Developer {
         this.age = age;
     }
 
+    public String getNumbersOfSkills() {
+        return numbersOfSkills;
+    }
+    public void setNumbersOfSkills(String numbersOfSkills) {
+        this.numbersOfSkills = numbersOfSkills;
+    }
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -68,6 +78,10 @@ public class Developer {
         this.skills = skills;
     }
 
+    public void addSkill(Skill skill) {
+        skills.add(skill);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,18 +99,32 @@ public class Developer {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for(Skill s: skills) {
-            builder.append("id: ")
+        String topLine = "------------------------------\n";
+        StringBuilder skill = new StringBuilder();
+        if (skills != null) {
+            for (Skill s : skills) {
+                skill.append("id: ")
                     .append(s.getID())
-                    .append(", name: ")
+                    .append(", имя: ")
                     .append(s.getSkillName())
                     .append("\n");
+            }
         }
-        return
-                "first name: " + firstName + "\n" +
-                "last name: " + lastName + "\n" +
-                "age: " + age + "\n" +
-                "skills: " + "\n" + builder.toString();
+        StringBuilder developer = new StringBuilder();
+                developer.append("id пользователя: ").append(id).append("\n")
+                        .append("имя: ").append(firstName).append("\n")
+                        .append("фамилия: ").append(lastName).append("\n")
+                        .append("возраст: ").append(age).append("\n")
+                        .append("\n");
+                        if (skill.length() > 0) {
+                            developer.append("Список навыков:\n")
+                                    .append(skill.toString())
+                                    .append(topLine);
+                        } else {
+                            developer.append("Список навыков пуст\n")
+                                    .append(topLine);
+                        }
+                return developer.toString();
+
     }
 }

@@ -45,9 +45,10 @@ public class IOUtils {
             List<String> rows = readFile(sourceFile);
             Optional<Long> result = rows.stream()
                     .filter(row -> row.length() > 5)
+                    .filter(row -> row.contains("id"))
                     .map(row -> row.split(separator))
-                    .map(array -> Long.parseLong(array[0]))
-                    .findFirst();
+                    .map(array -> Long.parseLong(array[1]))
+                    .max(Long::compareTo);
             return result.map(id -> id + 1L).orElse(1L);
         }  catch (ReadFileException e) {
             throw new ReadFileException("Ошибка при обращении к readFile() из метода generateID()." + e.getMessage());

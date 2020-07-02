@@ -10,13 +10,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SkillsRepository implements SkillIORepository {
 
     private final Path filepath = Paths.get("src\\resources\\skills.txt");
 
-    private final String separator = "/";
+    private final String separator = "=";
 
     @Override
     public boolean save(Skill obj) throws WriteFileException, ReadFileException {
@@ -29,8 +30,8 @@ public class SkillsRepository implements SkillIORepository {
 
     @Override
     public Optional<Skill> find(Long id) throws ReadFileException {
-        List<Skill> skills = findAll();
-        return skills.stream()
+        Map<Long,Skill> skills = findAll();
+        return skills.values().stream()
                 .filter(value -> value.getID().equals(id))
                 .findFirst();
     }
@@ -38,59 +39,80 @@ public class SkillsRepository implements SkillIORepository {
 
     @Override
     public boolean delete(Long id) throws ReadFileException, WriteFileException {
-        List<Skill> skills = findAll();
-        Optional<Skill> required = skills.stream().filter(obj -> obj.getID().equals(id)).findFirst();
-        if (!required.isPresent()) return false;
-
-        skills.remove(required.get());
-        return saveAll(skills);
+        Map<Long,Skill> skills = findAll();
+        Skill removed = skills.remove(id);
+        if (removed != null) {
+            return saveAll(new ArrayList<>(skills.values()));
+        }
+        return false;
     }
 
 
     @Override
     public boolean saveAll(List<Skill> list) throws WriteFileException {
-        Map<Long,Set<Skill>> groupedSkills = list.stream()
-                                            .collect(Collectors.groupingBy(Skill::getID,Collectors.toSet()));
         String dataToWrite =
-                groupedSkills.values().stream()
+                list.stream()
                 .map(this::objectToRepositoryFormat)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining());
 
         return IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
     }
 
 
     @Override
-    public boolean update(Long id, Skill oldValue, Skill newValue) throws ReadFileException, WriteFileException {
-        List<Skill> skills = findAll();
-        int index = skills.indexOf(oldValue);
-        if (index < 0) return false;
-        //TODO пользуюсь ли по итогу параметром id???
-        skills.set(index, newValue);
-            return saveAll(skills);
+    public boolean update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
+        Map<Long, Skill> skills = findAll();
+        for(Map.Entry<Long, Skill> entry: skills.entrySet()) {
+            if (entry.getKey().equals(id)) {
+                entry.setValue(newValue);
+                return saveAll(new ArrayList<>(skills.values()));
+            }
         }
+            return false;
+    }
 
 
     @Override
-    public List<Skill> findAll() throws ReadFileException {
+    public Map<Long,Skill> findAll() throws ReadFileException {
         List<String> rows = IOUtils.readFile(filepath);
-        List<Skill> skills = rows.stream()
-                                        .map(row -> row.split(separator))
-                                        .map(array -> new Skill(
-                                                Long.parseLong(array[0]),
-                                                array[1]))
-                                        .collect(Collectors.toList());
+        Iterator<String> iterator = rows.iterator();
+        List<Skill> list = new ArrayList<>();
+        while (iterator.hasNext()) {
+            String current = iterator.next();
+            if (current.equals("{")) {
+                String [][] tmp = new String[2][2];
+                int cnt = 0;
+                current = iterator.next().trim();
+                while (!current.equals("}")) {
+                    tmp[cnt++] = current.split(separator);
+                    current = iterator.next().trim();
+                }
+                list.add(new Skill(
+                            Long.parseLong(tmp[0][1]),
+                            tmp[1][1])
+                        );
+            }
+        }
+        Map<Long,Skill> skills = list.stream()
+                                    .collect(Collectors.toMap(
+                                            Skill::getID,
+                                            Function.identity(),
+                                            (s1,s2) -> s1,
+                                            HashMap::new));
         return skills;
     }
 
 
-    private String objectToRepositoryFormat(Set<Skill> skills) {
+    private String objectToRepositoryFormat(Skill skill) {
         StringBuilder result = new StringBuilder();
-        for(Skill elem: skills) {
-            result.append(elem.getID())
-                    .append(separator)
-                    .append(elem.getSkillName());
-        }
+            result
+                    .append("{\n")
+                    .append("\t")
+                    .append("id:=").append(skill.getID()).append("\n")
+                    .append("\t")
+                    .append("name:=").append(skill.getSkillName()).append("\n")
+                    .append("}\n");
+
         return result.toString();
     }
 

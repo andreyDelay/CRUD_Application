@@ -18,12 +18,13 @@ public class AccountRepository implements AccountIORepository<Account> {
 
     private Path filepath = Paths.get("src\\resources\\accounts.txt");
 
-    private final String separator = "/";
+    private final String separator = "=";
 
     @Override
     public boolean save(Account obj) throws WriteFileException, ReadFileException {
+        //TODO можно читать мапу и записывать если нет объекта, передавая в метод saveAll()
         obj.setId(IOUtils.generateID(filepath,separator));
-        String dataToWrite = obj.getAccountName();
+        String dataToWrite = objectToRepositoryFormat(obj);
 
         return IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.APPEND);
     }
@@ -41,18 +42,32 @@ public class AccountRepository implements AccountIORepository<Account> {
     @Override
     public Map<Long, Account> findAll() throws ReadFileException{
         List<String> fromRepository = IOUtils.readFile(filepath);
-        Map<Long, Account> accounts = fromRepository.stream()
-                                                .map(row -> row.split("/"))
-                                                .filter(value -> value.length == 2)
-                                                .map(value -> new Account(
-                                                        Long.parseLong(value[0]),
-                                                        value[1],
-                                                        AccountStatus.valueOf(value[2])))
-                                                .collect(Collectors.toMap(
-                                                                Account::getId,
-                                                                Function.identity(),
-                                                                (a1,a2) -> a1,
-                                                                HashMap::new));
+        Iterator<String> rows = fromRepository.iterator();
+        List<Account> list = new ArrayList<>();
+        while (rows.hasNext()) {
+            String current = rows.next();
+            if (current.equals("{")){
+                String [][] tmp = new String[3][2];
+                int cnt = 0;
+                current = rows.next().trim();
+                while (!current.equals("}")) {
+                    tmp[cnt++] = current.split(separator);
+                    current = rows.next().trim();
+                }
+                list.add(new Account(
+                            Long.parseLong(tmp[0][1]),
+                            tmp[1][1],
+                            AccountStatus.valueOf(tmp[2][1]))
+                                    );
+            }
+        }
+        Map<Long, Account> accounts = list.stream()
+                                        .collect(
+                                        Collectors.toMap(
+                                        Account::getId,
+                                        Function.identity(),
+                                        (a1,a2) -> a1,
+                                        HashMap::new));
         return accounts;
     }
 
@@ -67,16 +82,12 @@ public class AccountRepository implements AccountIORepository<Account> {
     @Override
     public boolean update(Long id, Account obj) throws WriteFileException, ReadFileException {
         Map<Long, Account> accounts = findAll();
-                            accounts.values().stream()
-                            .filter(value -> value.getId().equals(id))
-                            .peek(value -> value = obj);
-        //TODO проверить меняется ли объект в мапе после обработки в стриме
-        String dataToWrite = accounts.values()
-                                    .stream()
-                                    .map(this::objectToRepositoryFormat)
-                                    .collect(Collectors.joining("\n"));
+        for (Map.Entry<Long,Account> entry: accounts.entrySet()) {
+            if (entry.getKey().equals(id))
+                    entry.setValue(obj);
+        }
 
-        return IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.TRUNCATE_EXISTING);
+        return saveAll(new ArrayList<>(accounts.values()));
     }
 
     @Override
@@ -91,10 +102,15 @@ public class AccountRepository implements AccountIORepository<Account> {
     }
 
     private String objectToRepositoryFormat(Account account) {
-        return new StringBuilder()
-                .append(account.getId()).append("/")
-                .append(account.getAccountName()).append("/")
-                .append(account.getStatus().toString())
-                .toString();
+        StringBuilder str =  new StringBuilder()
+                            .append("{").append("\n")
+                            .append("\t")
+                            .append("id:=").append(account.getId()).append("\n")
+                            .append("\t")
+                            .append("name:=").append(account.getAccountName()).append("\n")
+                            .append("\t")
+                            .append("status:=").append(account.getStatus().toString()).append("\n")
+                            .append("}\n");
+        return str.toString();
     }
 }
