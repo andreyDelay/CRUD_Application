@@ -13,3 +13,17 @@
 	skills:=""
 }
 
+{
+	id:=3
+	firstName:=Vasya
+	lastName:=Vasilev
+	age:=22
+	skills:=""
+}
+{
+	id:=4
+	firstName:= Alexandr
+	lastName:=Alexandrov
+	age:=33
+	skills:=""
+}

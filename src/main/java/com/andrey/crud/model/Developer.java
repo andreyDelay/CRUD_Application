@@ -99,32 +99,29 @@ public class Developer {
 
     @Override
     public String toString() {
-        String topLine = "------------------------------\n";
-        StringBuilder skill = new StringBuilder();
-        if (skills != null) {
-            for (Skill s : skills) {
-                skill.append("id: ")
-                    .append(s.getID())
-                    .append(", имя: ")
-                    .append(s.getSkillName())
-                    .append("\n");
-            }
-        }
         StringBuilder developer = new StringBuilder();
-                developer.append("id пользователя: ").append(id).append("\n")
+        String topLine = "-----------------------\n";
+                developer
+                        .append(topLine)
+                        .append("id пользователя: ").append(id).append("\n")
                         .append("имя: ").append(firstName).append("\n")
                         .append("фамилия: ").append(lastName).append("\n")
                         .append("возраст: ").append(age).append("\n")
-                        .append("\n");
-                        if (skill.length() > 0) {
-                            developer.append("Список навыков:\n")
-                                    .append(skill.toString())
-                                    .append(topLine);
-                        } else {
-                            developer.append("Список навыков пуст\n")
-                                    .append(topLine);
-                        }
-                return developer.toString();
+                        .append("имя аккаунта: ").append(account.getAccountName())
+                        .append(", статус - ").append(account.getStatus().toString()).append("\n");
+                if (skills != null && skills.size() != 0) {
+                    developer.append("Список навыков: \n");
+                    for(Skill s: skills) {
+                        developer.append("id:=")
+                                .append(s.getID())
+                                .append(", название:=")
+                                .append(s.getSkillName())
+                                .append(";\n");
+                    }
+                } else {
+                    developer.append("Список навыков пуст.\n");
+                }
 
+        return developer.toString();
     }
 }

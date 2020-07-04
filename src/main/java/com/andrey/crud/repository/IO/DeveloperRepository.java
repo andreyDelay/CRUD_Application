@@ -110,7 +110,7 @@ public class DeveloperRepository implements DeveloperIORepository {
         Set<Skill> skills = object.getSkills();
 
         StringBuilder sk = new StringBuilder();
-        if (skills != null) {
+        if (skills != null && skills.size() > 0) {
             for (Skill s : skills)
                 sk.append(s.getID()).append(",");
             sk.delete(sk.length() - 1, sk.length());
