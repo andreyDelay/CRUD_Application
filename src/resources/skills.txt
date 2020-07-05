@@ -6,3 +6,7 @@
 	id:=2
 	name:=send requests
 }
+{
+	id:=3
+	name:=SSSSS
+}

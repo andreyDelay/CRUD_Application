@@ -32,17 +32,14 @@ public class SkillController {
         return "навык удалён.";
     }
 
-    public String showAllExistingSkills() {
-        return "Все навыки в общем всего";
-    }
 
     public<ID extends Number,S> String updateSkill(ID skillId, String newName) {
         return "Навык обновлён";
     }
 
-    public String saveSkill(String name) {
+    public Skill saveSkill(String name) {
 
-        return "навык создан.";
+        return current;
     }
 
     public Map<Long,Skill> allSkills() throws ReadFileException {

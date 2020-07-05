@@ -107,15 +107,12 @@ public class DeveloperRepository implements DeveloperIORepository {
     }
 
     private String objectToRepositoryFormat(Developer object) {
-        Set<Skill> skills = object.getSkills();
 
         StringBuilder sk = new StringBuilder();
-        if (skills != null && skills.size() > 0) {
-            for (Skill s : skills)
-                sk.append(s.getID()).append(",");
-            sk.delete(sk.length() - 1, sk.length());
-        } else {
+        if (!object.getNumbersOfSkills().contains(",")) {
             sk.append("\"\"");
+        } else {
+            sk.append(object.getNumbersOfSkills());
         }
 
         StringBuilder dataToWrite = new StringBuilder();

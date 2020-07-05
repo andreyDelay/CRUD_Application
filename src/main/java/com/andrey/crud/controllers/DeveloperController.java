@@ -143,7 +143,17 @@ public class DeveloperController {
     }
 
     public<ID extends Number> String removeAllSkillsFromDeveloper(ID developerId) {
+        try {
+            Optional<Developer> result = repository.find(longParser(developerId));
+            if (!result.isPresent())
+                return "пользователь с таким id не найден";
 
+                current = result.get();
+                current.setNumbersOfSkills("");
+                repository.update(current.getId(), current);
+        } catch (ReadFileException | WriteFileException e) {
+            return "Ошибка при работе с базой данных в методе removeAllSkillsFromDeveloper()";
+        }
         return "все навыки удалены";
     }
 

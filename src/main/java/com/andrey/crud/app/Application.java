@@ -8,7 +8,7 @@ public class Application {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int option;
+        int option = -1;
 
         System.out.println("Добро пожаловать в приложение!");
         System.out.println("*********************************\n");
@@ -17,7 +17,13 @@ public class Application {
         showMenu();
 
         do {
-            option = scanner.nextInt();
+            try {
+                option = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Введите номер так, как он указан в списке меню.");
+                scanner.nextLine();
+                option = scanner.nextInt();
+            }
 
             switch (option) {
                 case 1 :
@@ -85,6 +91,9 @@ public class Application {
                 case 13:
                     showAllData();
                     showMenu();
+                    break;
+                case 14:
+
                     break;
                 case 20:
                     showMenu();

@@ -53,13 +53,16 @@ public class ViewHelper {
     }
 
     public static int readOption(Scanner scanner) {
+        int option;
         try {
-            int option = scanner.nextInt();
+            option = scanner.nextInt();
             return option;
         } catch (Exception e) {
             System.out.println("Введите номер так, как он указан в списке меню.");
+            scanner.nextLine();
+            option = readOption(scanner);
+            return option;
         }
-        return -1;
     }
 
     public static void showAllInShort() {
@@ -116,7 +119,7 @@ public class ViewHelper {
     }
 
     public static void removeSkillsForOneDeveloper(int id) {
-        System.out.println("доделать");
+        System.out.println(developerController.removeAllSkillsFromDeveloper(id));
     }
 
     public static void removeSkillFromAll(int id) {
@@ -143,6 +146,15 @@ public class ViewHelper {
         System.out.println("Введите ключевое слово для поиска пользователей с похожим навыком");
         String key;
         key = scanner.nextLine();
+    }
+
+    public static void addSkillToDeveloper(Scanner scanner) {
+        int id;
+        String skill;
+        System.out.println("Введите id аккаунта");
+        id = readOption(scanner);
+        System.out.println("Введите имя навыка");
+        skill = scanner.nextLine();
 
     }
 }
