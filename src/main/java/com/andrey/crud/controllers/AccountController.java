@@ -7,17 +7,15 @@ import com.andrey.crud.model.Account;
 import com.andrey.crud.model.AccountStatus;
 import com.andrey.crud.repository.IO.AccountRepository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AccountController {
 
     private AccountRepository repository = new AccountRepository();
     private Account current;
-
-    public String showAccount(String id) {
-        return "Такого аккаунта не существует.";
-    }
 
     public String createAccount(String accountName) {
         if (!checkAccountName(accountName))
@@ -69,6 +67,96 @@ public class AccountController {
             return "Не удалось сохранить изменения";
         }
         return "Аккаунт успешно удалён";
+    }
+
+    public<L extends Number> String blockAccount(L id) {
+        try {
+            Optional<Account> result = repository.find(longParser(id));
+            if (result.isPresent()) {
+                current = result.get();
+                if (current.getStatus().toString().equals("BANNED"))
+                    return "Аккаунт уже был заблокирован ранее.";
+
+                current.setStatus(AccountStatus.BANNED);
+                repository.update(current.getId(),current);
+            } else {
+                return "Пользователя с таким id не существует.";
+            }
+        } catch (ReadFileException e) {
+            return "Не удалось получить данные для аккаунта";
+        } catch (WriteFileException e) {
+            return "Не удалось сохранить изменения";
+        }
+        return "Аккаунт успешно заблокирован";
+    }
+
+    public String showAllActive() {
+        try {
+            Map<Long,Account> accounts = accounts();
+            List<Account> active = accounts.values().stream()
+                                            .filter(account -> account.getStatus().toString().equals("ACTIVE"))
+                                            .collect(Collectors.toList());
+            if (active.size() == 0)
+                return "в базе нет активных аккаунтов";
+
+            StringBuilder result = new StringBuilder("Список активных аккаунтов:\n");
+            for (Account a: active) {
+                result.append("id:=")
+                        .append(a.getId())
+                        .append(", name:=")
+                        .append(a.getAccountName())
+                        .append(";\n");
+            }
+            return result.toString();
+        } catch (ReadFileException e) {
+            return "Не удалось прочитать базу данных. " + e.getMessage();
+        }
+    }
+
+    public String showDeleted() {
+        try {
+            Map<Long,Account> accounts = accounts();
+            List<Account> deleted = accounts.values().stream()
+                    .filter(account -> account.getStatus().toString().equals("DELETED"))
+                    .collect(Collectors.toList());
+            if (deleted.size() == 0)
+                return "в базе нет удалённых аккаунтов";
+
+            StringBuilder result = new StringBuilder("Список удалённых аккаунтов:\n");
+            for (Account a: deleted) {
+                result.append("id:=")
+                        .append(a.getId())
+                        .append(", name:=")
+                        .append(a.getAccountName())
+                        .append(";\n");
+            }
+            return result.toString();
+        } catch (ReadFileException e) {
+            return "Не удалось прочитать базу данных. " + e.getMessage();
+        }
+    }
+
+    public String showBlocked() {
+        try {
+            Map<Long,Account> accounts = accounts();
+            List<Account> deleted = accounts.values().stream()
+                    .filter(account -> account.getStatus().toString().equals("BANNED"))
+                    .collect(Collectors.toList());
+            if (deleted.size() == 0)
+                return "в базе нет заблокированных аккаунтов";
+
+            StringBuilder result = new StringBuilder("Список заблокированных аккаунтов:\n");
+            for (Account a: deleted) {
+                result.append("id:=")
+                        .append(a.getId())
+                        .append(", name:=")
+                        .append(a.getAccountName())
+                        .append(";\n");
+            }
+            return result.toString();
+        } catch (ReadFileException e) {
+            return "Не удалось прочитать базу данных. " + e.getMessage();
+        }
     }
 
     public Map<Long, Account> accounts() throws ReadFileException {

@@ -3,7 +3,6 @@
 	name:=admin
 	status:=ACTIVE
 }
-
 {
 	id:=2
 	name:=welder
@@ -16,16 +15,6 @@
 }
 {
 	id:=4
-	name:=barakuda
-	status:=ACTIVE
-}
-{
-	id:=5
-	name:=barakuda
-	status:=ACTIVE
-}
-{
-	id:=6
 	name:=sanya666
 	status:=ACTIVE
 }

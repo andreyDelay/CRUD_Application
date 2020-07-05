@@ -75,7 +75,7 @@ public class AccountRepository implements AccountIORepository<Account> {
     public boolean saveAll(List<Account> list) throws WriteFileException {
         String dataToWrite = list.stream()
                                 .map(this::objectToRepositoryFormat)
-                                .collect(Collectors.joining("\n"));
+                                .collect(Collectors.joining());
         return IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.TRUNCATE_EXISTING);
     }
 

@@ -3,7 +3,9 @@ package com.andrey.crud.utils;
 import com.andrey.crud.controllers.AccountController;
 import com.andrey.crud.controllers.DeveloperController;
 import com.andrey.crud.controllers.SkillController;
+import com.andrey.crud.model.Account;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class ViewHelper {
@@ -14,22 +16,22 @@ public class ViewHelper {
     public static void showMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
-        System.out.println("1. Показать данные одного аккаунта по id");
+        System.out.println("1. Показать подробные данные одного пользователя по id");
         System.out.println("2. Удалить аккаунт");
         System.out.println("3. Добавить пользователя");
         System.out.println("4. Удалить навык у пользователя");
         System.out.println("5. Удалить все навыки у пользователя");
         System.out.println("6. Удалить заданный навык у всех");
-        System.out.println("7. Добавить заданный навык всем");
         System.out.println();
-        System.out.println("8. Заблокировать аккаунт");
-        System.out.println("9. Список активных аккаунтов");
-        System.out.println("10. Список удалённых аккаунтов");
-        System.out.println("11. Список заблокированных аккаунтов");
+        System.out.println("7. Заблокировать аккаунт");
+        System.out.println("8. Список активных аккаунтов");
+        System.out.println("9. Список удалённых аккаунтов");
+        System.out.println("10. Список заблокированных аккаунтов");
         System.out.println();
-        System.out.println("12. Список пользователей с похожим навыком");
-        System.out.println("13. Восстановить аккаунт");
-        System.out.println("14. Все данные");
+        System.out.println("11. Список пользователей с похожим навыком");
+        System.out.println("12. Восстановить аккаунт");
+        System.out.println("13. Все данные");
+        System.out.println("14. Добавить навык");
         System.out.println();
         System.out.println("0. Выход");
         System.out.println("===============================");
@@ -38,12 +40,13 @@ public class ViewHelper {
     public static void showSecondaryMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
+        System.out.println("1. Показать подробные данные");
         System.out.println("2. Удалить аккаунт");
         System.out.println("4. Удалить навык у пользователя");
         System.out.println("5. Удалить все навыки у пользователя");
-        System.out.println("8. Заблокировать аккаунт");
-        System.out.println("13. Восстановить аккаунт");
-        System.out.println("14. Все данные");
+        System.out.println("7. Заблокировать аккаунт");
+        System.out.println("12. Восстановить аккаунт");
+        System.out.println("13. Все данные");
         System.out.println("20. Полный список меню");
         System.out.println("0. Выход");
         System.out.println("===============================");
@@ -57,6 +60,10 @@ public class ViewHelper {
             System.out.println("Введите номер так, как он указан в списке меню.");
         }
         return -1;
+    }
+
+    public static void showAllInShort() {
+        System.out.println(developerController.showAllInShortForm());
     }
 
     public static void showAllData() {
@@ -106,5 +113,36 @@ public class ViewHelper {
         System.out.println("Введите номер навыка, который нужно удалить");
         int skillId = readOption(scanner);
         System.out.println(developerController.removeSkillFromDeveloper(id, skillId));
+    }
+
+    public static void removeSkillsForOneDeveloper(int id) {
+        System.out.println("доделать");
+    }
+
+    public static void removeSkillFromAll(int id) {
+        System.out.println(skillController.removeSkillFromAll(id));
+    }
+
+    public static void blockAccount(int id) {
+        System.out.println(accountController.blockAccount(id));
+    }
+
+    public static void allActive() {
+        System.out.println(accountController.showAllActive());
+    }
+
+    public static void  allDeleted() {
+        System.out.println(accountController.showDeleted());
+    }
+
+    public static void  allBlocked() {
+        System.out.println(accountController.showBlocked());
+    }
+
+    public static void showWithSimilarSkill(Scanner scanner) {
+        System.out.println("Введите ключевое слово для поиска пользователей с похожим навыком");
+        String key;
+        key = scanner.nextLine();
+
     }
 }

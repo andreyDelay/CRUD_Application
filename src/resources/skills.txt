@@ -6,11 +6,3 @@
 	id:=2
 	name:=send requests
 }
-{
-	id:=3
-	name:=catch the bus
-}
-{
-	id:=4
-	name:=to have a cup of tea
-}

@@ -13,7 +13,7 @@ public class Application {
         System.out.println("Добро пожаловать в приложение!");
         System.out.println("*********************************\n");
         System.out.println("Список существующих разработчиков:");
-        showAllData();
+        showAllInShort();
         showMenu();
 
         do {
@@ -42,17 +42,52 @@ public class Application {
                     removeSkillFromDeveloper(option,scanner);
                     showSecondaryMenu();
                     break;
-                case 13:
-                    System.out.println(111);
+                case 5:
+                    System.out.println("Введите id пользователя");
+                    option = readOption(scanner);
+                    removeSkillsForOneDeveloper(option);
+                    showSecondaryMenu();
+                    break;
+                case 6:
+                    System.out.println("Введите id навыка(данный навык будет удалён у всех)");
+                    option = readOption(scanner);
+                    removeSkillFromAll(option);
+                    showMenu();
+                    break;
+                case 7:
+                    System.out.println("Введите id аккаунта,который необходимо заблокировать");
+                    option = readOption(scanner);
+                    blockAccount(option);
+                    showSecondaryMenu();
+                    break;
+                case 8:
+                    allActive();
+                    showMenu();
+                    break;
+                case 9:
+                    allDeleted();
+                    showMenu();
+                    break;
+                case 10:
+                    allBlocked();
+                    showMenu();
+                    break;
+                case 11:
+                    showWithSimilarSkill(scanner);
+                    showMenu();
+                    break;
+                case 12:
+                    System.out.println("Введите id аккаунта, который нужно восстановить");
+                    option = readOption(scanner);
                     recoverAccount();
                     showSecondaryMenu();
                     break;
-                case 14:
+                case 13:
                     showAllData();
+                    showMenu();
                     break;
                 case 20:
                     showMenu();
-                    option = readOption(scanner);
                     break;
             }
 
