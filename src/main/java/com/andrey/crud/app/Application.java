@@ -5,7 +5,7 @@ import static com.andrey.crud.utils.ViewHelper.*;
 import java.util.Scanner;
 
 public class Application {
-
+    private static boolean trigger = false;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int option = -1;
@@ -30,12 +30,14 @@ public class Application {
                     System.out.println("Список существующих разработчиков:");
                     showAllData();
                     showMenu();
+                    trigger = false;
                     break;
                 case 2:
                     System.out.println("Введите id пользователя");
                     option = readOption(scanner);
                     showDeveloper(option);
                     showSecondaryMenu();
+                    trigger = true;
                     break;
                 case 3:
                     addEntity(scanner);
@@ -92,18 +94,39 @@ public class Application {
                     showMenu();
                     break;
                 case 20:
+                    if (!trigger) break;
                     changeName(scanner);
                     showSecondaryMenu();
                     break;
                 case 21:
+                    if (!trigger) break;
                     changeLastName(scanner);
                     showSecondaryMenu();
                     break;
                 case 22:
+                    if (!trigger) break;
                     addSkillToDeveloper(scanner);
                     showSecondaryMenu();
                     break;
+                case 23:
+                    if (!trigger) break;
+                    removeSkillFromDeveloper(scanner);
+                    showSecondaryMenu();
+                    break;
+                case 24:
+                    if (!trigger) break;
+                    removeSkillsForOneDeveloper();
+                    showSecondaryMenu();
+                    break;
+                case 25:
+                    if (!trigger) break;
+                    System.out.println("Введите id");
+                    option = readOption(scanner);
+                    showDeveloper(option);
+                    showSecondaryMenu();
+                    break;
                 case 30:
+                    trigger = false;
                     showMenu();
                     break;
             }

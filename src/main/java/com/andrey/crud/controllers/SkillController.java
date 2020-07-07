@@ -31,14 +31,18 @@ public class SkillController {
         return index;
     }
 
-    public<ID extends Number,S> String updateSkill(ID skillId, String newName) {
-        return "Навык обновлён";
-    }
-
     public Skill saveSkill(String name) {
         try {
             if (!checkSkillName(name))
                 return null;
+
+            Map<Long,Skill> skills = repository.findAll();
+            for (Map.Entry<Long,Skill> entry: skills.entrySet()) {
+                if (entry.getValue().getSkillName().equalsIgnoreCase(name)) {
+                    current = entry.getValue();
+                    return current;
+                }
+            }
 
             current = repository.save(new Skill(name));
             return current;

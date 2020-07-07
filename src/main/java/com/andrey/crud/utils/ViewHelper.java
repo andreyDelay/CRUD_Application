@@ -8,6 +8,7 @@ import com.andrey.crud.model.AccountStatus;
 import com.andrey.crud.model.Developer;
 import com.andrey.crud.model.Skill;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+import org.w3c.dom.ls.LSOutput;
 
 import java.sql.SQLOutput;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ViewHelper {
     public static void showMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
-        System.out.println("1. Показать подробные данный всех аккаунтов");
+        System.out.println("1. Показать подробные данные всех аккаунтов");
         System.out.println("2. Показать подробные данные одного аккаунта по id");
         System.out.println("3. Добавить пользователя");
         System.out.println("4. Удалить пользователя");
@@ -206,6 +207,7 @@ public class ViewHelper {
 //20.
     public static void changeName(Scanner scanner) {
         System.out.println("Введите новое имя пользователя:");
+        scanner.nextLine();
         String name = scanner.nextLine();
         Developer developer = developerController.changeName(name);
         if (developer != null) {
@@ -218,6 +220,7 @@ public class ViewHelper {
 //21.
     public static void changeLastName(Scanner scanner) {
         System.out.println("Введите новую фамилию пользователя:");
+        scanner.nextLine();
         String lastName = scanner.nextLine();
         Developer developer = developerController.changeLastName(lastName);
         if (developer != null) {
@@ -225,32 +228,47 @@ public class ViewHelper {
             System.out.println(developer.toString());
             return;
         }
-        System.out.println("Не удалось изменить имя.");
+        System.out.println("Не удалось изменить фамилию.");
     }
 //22.
     public static void addSkillToDeveloper(Scanner scanner) {
         String name;
         System.out.println("Введите имя навыка");
+        scanner.nextLine();
         name = scanner.nextLine();
         Skill newSkill = skillController.saveSkill(name);
         if (newSkill != null) {
             Developer developer = developerController.getCurrentDeveloper();
-            developer = developerController.addSkillToDeveloper(newSkill);
-            System.out.println("Навык добавлен");
+            if (developer != null) {
+                developer = developerController.addSkillToDeveloper(newSkill);
+                System.out.println("Навык добавлен");
+                System.out.println(developer.toString());
+                return;
+            }
+        }
+        System.out.println("Операция не выполнена");
+    }
+//23.
+    public static void removeSkillFromDeveloper(Scanner scanner) {
+        System.out.println("Введите id навыка, который нужно удалить");
+        int skillId = readOption(scanner);
+        Developer developer = developerController.removeSkillFromDeveloper(skillId);
+        if (developer != null) {
+            System.out.println("Навык успешно удалён");
             System.out.println(developer.toString());
             return;
         }
         System.out.println("Операция не выполнена");
     }
-
-    public static void removeSkillFromDeveloper(int id, Scanner scanner) {
-        System.out.println("Введите номер навыка, который нужно удалить");
-        int skillId = readOption(scanner);
-        System.out.println(developerController.removeSkillFromDeveloper(id, skillId));
-    }
-
-    public static void removeSkillsForOneDeveloper(int id) {
-        System.out.println(developerController.removeAllSkillsFromDeveloper(id));
+//24.
+    public static void removeSkillsForOneDeveloper() {
+        Developer developer = developerController.removeAllSkillsFromDeveloper();
+        if (developer != null) {
+            System.out.println("Навыки удалены");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Операция не выполнена.");
     }
 
 

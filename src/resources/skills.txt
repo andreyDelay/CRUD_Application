@@ -2,11 +2,8 @@
 	id:=1
 	name:=write Java code
 }
+
 {
-	id:=2
-	name:=send requests
-}
-{
-	id:=3
-	name:=SSSSS
+	id:=4
+	name:=sleep at noon
 }

@@ -3,29 +3,26 @@
 	firstName:=Andrey
 	lastName:=Bezruk
 	age:=31
-	skills:=1,2,3
+	skills:=1,
 }
-
 {
 	id:=2
 	firstName:=Oleg
 	lastName:=Ivanov
 	age:=36
-	skills:=""
+	skills:=1,
 }
-
 {
 	id:=3
 	firstName:=Vasya
 	lastName:=Vasilev
 	age:=22
-	skills:=1,2,3
+	skills:=1,
 }
-
 {
 	id:=4
 	firstName:= Alexandr
 	lastName:=Alexandrov
 	age:=33
-	skills:=1,2,3
+	skills:=1,
 }

@@ -52,7 +52,7 @@ public class SkillsRepository implements SkillIORepository {
         String dataToWrite =
                 list.stream()
                 .map(this::objectToRepositoryFormat)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining("\n"));
 
         return IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
     }
