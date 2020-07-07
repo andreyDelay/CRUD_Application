@@ -37,6 +37,13 @@ public class DeveloperController {
     public<ID extends Number> Developer deleteDeveloper(ID developerId) {
         try {
             current = repository.delete(longParser(developerId));
+
+            AccountController accountController = new AccountController();
+            Account account = accountController.deleteAccount(current.getAccount());
+            if (account == null) {
+                System.out.println("Аккаунт данного пользователя не был удалён из БД");
+            }
+
             if (current != null)
                 return current;
         } catch (WriteFileException e) {

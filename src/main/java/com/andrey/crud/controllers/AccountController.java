@@ -43,6 +43,18 @@ public class AccountController {
         return current;
     }
 
+    public Account deleteAccount(Account account) {
+        try {
+            current = repository.delete(account.getId());
+            return current;
+        } catch (ReadFileException e) {
+            System.out.println("Ошибка чтения базы данных." + e.getMessage());
+        } catch (WriteFileException e) {
+            System.out.println("Ошибка записи в базу данных." + e.getMessage());
+        }
+        return null;
+    }
+
     public<ID extends Number> Account changeAccountStatus(ID id, AccountStatus newStatus) {
         try {
             Optional<Account> result = repository.find(longParser(id));

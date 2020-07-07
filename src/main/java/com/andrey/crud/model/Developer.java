@@ -11,7 +11,7 @@ public class Developer {
     private String lastName;
     private int age;
 
-    private String numbersOfSkills;
+    private String numbersOfSkills = "";
 
     private Set<Skill> skills = new HashSet<>();
     private Account account;

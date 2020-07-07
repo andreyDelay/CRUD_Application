@@ -112,7 +112,9 @@ public class ViewHelper {
         }
         Developer developer = developerController.createDeveloper(data[1],data[2],data[3]);
         if (developer != null) {
-            System.out.println("Данные нового пользователя:\n");
+            developer.setAccount(account);
+            System.out.println("Пользователь добавлен.");
+            System.out.println("Данные нового пользователя:");
             System.out.println(developer.toString());
             return;
         }
