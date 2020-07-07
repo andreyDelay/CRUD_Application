@@ -20,13 +20,16 @@ public class AccountRepository implements AccountIORepository<Account> {
 
     private final String separator = "=";
 
-    @Override
-    public boolean save(Account obj) throws WriteFileException, ReadFileException {
-        //TODO можно читать мапу и записывать если нет объекта, передавая в метод saveAll()
-        obj.setId(IOUtils.generateID(filepath,separator));
-        String dataToWrite = objectToRepositoryFormat(obj);
 
-        return IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.APPEND);
+    @Override
+    public Account save(Account account) throws WriteFileException, ReadFileException {
+        //TODO можно читать мапу и записывать если нет объекта, передавая в метод saveAll()
+        account.setId(IOUtils.generateID(filepath,separator));
+        String dataToWrite = objectToRepositoryFormat(account);
+
+        IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.APPEND);
+
+        return account;
     }
 
     @Override
@@ -80,25 +83,29 @@ public class AccountRepository implements AccountIORepository<Account> {
     }
 
     @Override
-    public boolean update(Long id, Account obj) throws WriteFileException, ReadFileException {
+    public Account update(Long id, Account account) throws WriteFileException, ReadFileException {
         Map<Long, Account> accounts = findAll();
         for (Map.Entry<Long,Account> entry: accounts.entrySet()) {
-            if (entry.getKey().equals(id))
-                    entry.setValue(obj);
+            if (entry.getKey().equals(id)) {
+                entry.setValue(account);
+                Account updated = entry.getValue();
+                saveAll(new ArrayList<>(accounts.values()));
+                return updated;
+            }
         }
-
-        return saveAll(new ArrayList<>(accounts.values()));
+        return null;
     }
 
     @Override
-    public boolean delete(Long id) throws WriteFileException, ReadFileException {
+    public Account delete(Long id) throws WriteFileException, ReadFileException {
         Map<Long, Account> accounts = findAll();
         Account removed = accounts.get(id);
         if (removed != null) {
             accounts.remove(id);
-            return saveAll(new ArrayList<>(accounts.values()));
+            saveAll(new ArrayList<>(accounts.values()));
+            return removed;
         }
-        return false;
+        return null;
     }
 
     private String objectToRepositoryFormat(Account account) {

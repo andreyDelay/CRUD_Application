@@ -20,13 +20,13 @@ public class SkillsRepository implements SkillIORepository {
     private final String separator = "=";
 
     @Override
-    public boolean save(Skill obj) throws WriteFileException, ReadFileException {
-        obj.setID(IOUtils.generateID(filepath,separator));
-        String dataToWrite = objectToRepositoryFormat(obj);
+    public Skill save(Skill skill) throws WriteFileException, ReadFileException {
+        skill.setID(IOUtils.generateID(filepath,separator));
+        String dataToWrite = objectToRepositoryFormat(skill);
 
-        return IOUtils.writeFile(dataToWrite,filepath, StandardOpenOption.APPEND);
+        IOUtils.writeFile(dataToWrite,filepath, StandardOpenOption.APPEND);
+        return skill;
     }
-
 
     @Override
     public Optional<Skill> find(Long id) throws ReadFileException {
@@ -36,17 +36,16 @@ public class SkillsRepository implements SkillIORepository {
                 .findFirst();
     }
 
-
     @Override
-    public boolean delete(Long id) throws ReadFileException, WriteFileException {
+    public Skill delete(Long id) throws ReadFileException, WriteFileException {
         Map<Long,Skill> skills = findAll();
         Skill removed = skills.remove(id);
         if (removed != null) {
-            return saveAll(new ArrayList<>(skills.values()));
+            saveAll(new ArrayList<>(skills.values()));
+            return removed;
         }
-        return false;
+        return null;
     }
-
 
     @Override
     public boolean saveAll(List<Skill> list) throws WriteFileException {
@@ -58,19 +57,19 @@ public class SkillsRepository implements SkillIORepository {
         return IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-
     @Override
-    public boolean update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
+    public Skill update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
         Map<Long, Skill> skills = findAll();
         for(Map.Entry<Long, Skill> entry: skills.entrySet()) {
             if (entry.getKey().equals(id)) {
                 entry.setValue(newValue);
-                return saveAll(new ArrayList<>(skills.values()));
+                Skill updated = entry.getValue();
+                saveAll(new ArrayList<>(skills.values()));
+                return updated;
             }
         }
-            return false;
+            return null;
     }
-
 
     @Override
     public Map<Long,Skill> findAll() throws ReadFileException {

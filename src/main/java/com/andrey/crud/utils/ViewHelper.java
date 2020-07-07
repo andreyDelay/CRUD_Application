@@ -4,9 +4,15 @@ import com.andrey.crud.controllers.AccountController;
 import com.andrey.crud.controllers.DeveloperController;
 import com.andrey.crud.controllers.SkillController;
 import com.andrey.crud.model.Account;
+import com.andrey.crud.model.AccountStatus;
+import com.andrey.crud.model.Developer;
+import com.andrey.crud.model.Skill;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 
-import java.util.Map;
+import java.sql.SQLOutput;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ViewHelper {
     private static DeveloperController developerController = new DeveloperController();
@@ -16,23 +22,21 @@ public class ViewHelper {
     public static void showMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
-        System.out.println("1. Показать подробные данные одного пользователя по id");
-        System.out.println("2. Удалить аккаунт");
+        System.out.println("1. Показать подробные данный всех аккаунтов");
+        System.out.println("2. Показать подробные данные одного аккаунта по id");
         System.out.println("3. Добавить пользователя");
-        System.out.println("4. Удалить навык у пользователя");
-        System.out.println("5. Удалить все навыки у пользователя");
-        System.out.println("6. Удалить заданный навык у всех");
+        System.out.println("4. Удалить пользователя");
         System.out.println();
-        System.out.println("7. Заблокировать аккаунт");
+        System.out.println("5. Удалить аккаунт");
+        System.out.println("6. Заблокировать аккаунт");
+        System.out.println("7. Восстановить аккаунт");
         System.out.println("8. Список активных аккаунтов");
         System.out.println("9. Список удалённых аккаунтов");
         System.out.println("10. Список заблокированных аккаунтов");
         System.out.println();
-        System.out.println("11. Список пользователей с похожим навыком");
-        System.out.println("12. Восстановить аккаунт");
-        System.out.println("13. Все данные");
-        System.out.println("14. Добавить навык");
-        System.out.println();
+        System.out.println("11. Список существующих навыков");
+        System.out.println("12. Удалить заданный навык у всех");
+        System.out.println("13. Список пользователей с ключевым словом навыка");
         System.out.println("0. Выход");
         System.out.println("===============================");
     }
@@ -40,16 +44,20 @@ public class ViewHelper {
     public static void showSecondaryMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
-        System.out.println("1. Показать подробные данные");
-        System.out.println("2. Удалить аккаунт");
-        System.out.println("4. Удалить навык у пользователя");
-        System.out.println("5. Удалить все навыки у пользователя");
-        System.out.println("7. Заблокировать аккаунт");
-        System.out.println("12. Восстановить аккаунт");
-        System.out.println("13. Все данные");
-        System.out.println("20. Полный список меню");
+        System.out.println("20. Изменить имя");
+        System.out.println("21. Изменить фамилию");
+        System.out.println("22. Добавить навык");
+        System.out.println("23. Удалить навык");
+        System.out.println("24. Удалить все навыки");
+        System.out.println("25. Показать данные другого аккаунта");
+        System.out.println();
+        System.out.println("30. Полный список меню");
         System.out.println("0. Выход");
         System.out.println("===============================");
+    }
+
+    public static void showAllInShort() {
+        System.out.println(developerController.showAllInShortForm());
     }
 
     public static int readOption(Scanner scanner) {
@@ -65,31 +73,26 @@ public class ViewHelper {
         }
     }
 
-    public static void showAllInShort() {
-        System.out.println(developerController.showAllInShortForm());
-    }
 
+//1.
     public static void showAllData() {
         System.out.println(developerController.showAllDevelopers());
     }
-
+//2.
     public static void showDeveloper(int id) {
-        System.out.println(developerController.showOneDeveloper(id));
+        Developer developer = developerController.showOneDeveloper(id);
+        if (developer != null) {
+            System.out.println("Данные пользователя:\n");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Нет данных");
     }
-
-    public static void removeAccount(int id) {
-        System.out.println(accountController.deleteAccount(id));
-    }
-
-    public static void recoverAccount() {
-        Long id = developerController.getCurrentDeveloper().getId();
-        System.out.println(accountController.recoverAccount(id));
-    }
-
+//3.
     public static void addEntity(Scanner scanner) {
         System.out.println("Введите данные нового пользователя в формате:");
         System.out.println("Имя аккаунта, имя, фамилия, возраст");
-        
+
         String option;
         scanner.nextLine();
         option = scanner.nextLine();
@@ -101,15 +104,143 @@ public class ViewHelper {
                 return;
             }
         }
-        String result = accountController.createAccount(data[0]);
-        if (!result.equals("Аккаунт сохранён.")) {
-            System.out.println(result);
+        Account account = accountController.createAccount(data[0]);
+        if (account == null) {
+            System.out.println("Не удалось создать и сохранить аккаунт");
             return;
         }
-        System.out.println(
-        developerController.createDeveloper(data[1],data[2],data[3]));
-        System.out.println(developerController.showOneDeveloper(
-                            developerController.getCurrentDeveloper().getId()));
+        Developer developer = developerController.createDeveloper(data[1],data[2],data[3]);
+        if (developer != null) {
+            System.out.println("Данные нового пользователя:\n");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Пользователь не создан.");
+    }
+//4.
+    public static void deleteDeveloper(int id) {
+        Developer developer = developerController.deleteDeveloper(id);
+        if (developer != null) {
+            System.out.println("Пользователь " +
+                                developer.getLastName() + " " +
+                                developer.getLastName() + " " +
+                                "удалён");
+            return;
+        }
+        System.out.println("Операция не выполнена");
+    }
+//5.
+    public static void deleteAccount(int id) {
+        Account account = accountController.changeAccountStatus(id, AccountStatus.DELETED);
+        if (account != null) {
+            System.out.println("Аккаунт успешно удалён");
+            System.out.println(account.toString());
+            return;
+        }
+        System.out.println("Не удалось удалить.");
+    }
+//6.
+    public static void blockAccount(int id) {
+        Account account = accountController.changeAccountStatus(id, AccountStatus.BANNED);
+        if (account != null) {
+            System.out.println("Аккаунт успешно заблокирован");
+            System.out.println(account.toString());
+            return;
+        }
+        System.out.println("Не удалось заблокировать.");
+    }
+//7.
+    public static void recoverAccount(int id) {
+        Account account = accountController.changeAccountStatus(id, AccountStatus.ACTIVE);
+        if (account != null) {
+            System.out.println("Аккаунт успешно восстановлен");
+            System.out.println("Данные аккаунта:\n");
+            Developer developer = developerController.showOneDeveloper(account.getId());
+            if (developer != null) {
+                System.out.println(developer.toString());
+            } else {
+                System.out.println(account.toString());
+            }
+            return;
+        }
+        System.out.println("Операция не выполнена.");
+    }
+//8.
+    public static void allActive() {
+        System.out.println(accountController.showAccountWithRequiredStatus(AccountStatus.ACTIVE));
+    }
+//9.
+    public static void allDeleted() {
+    System.out.println(accountController.showAccountWithRequiredStatus(AccountStatus.DELETED));
+    }
+//10.
+    public static void  allBlocked() {
+        System.out.println(accountController.showAccountWithRequiredStatus(AccountStatus.BANNED));
+    }
+//11.
+    public static void showAllExistingSkills() {
+        System.out.println(skillController.showAllSkills());
+    }
+//12.
+    public static void removeSkillFromAll(int id) {
+        int index = skillController.removeSkillFromAll(id);
+        if (index == 0) {
+            System.out.println("Навык не был найден ни у одного пользователя.");
+        } else {
+            System.out.println("Навык удалён у " + index + " пользователя(ей)");
+        }
+    }
+//13.
+    public static void showWithSimilarSkill(Scanner scanner) {
+        System.out.println("Введите ключевое слово для поиска пользователей с похожим навыком");
+        String key;
+        key = scanner.nextLine();
+        List<Developer> result = developerController.showDevelopersWithKeySkillWord(key);
+        if (result.size() == 0) {
+            System.out.println("Не найдено ни одного пользователя с похожим навыком.");
+            return;
+        }
+        System.out.println("Список пользователей с похожим навыком:");
+        System.out.println(result.stream().map(Developer::toString).collect(Collectors.joining()));
+    }
+//20.
+    public static void changeName(Scanner scanner) {
+        System.out.println("Введите новое имя пользователя:");
+        String name = scanner.nextLine();
+        Developer developer = developerController.changeName(name);
+        if (developer != null) {
+            System.out.println("Данные изменены");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Не удалось изменить имя.");
+    }
+//21.
+    public static void changeLastName(Scanner scanner) {
+        System.out.println("Введите новую фамилию пользователя:");
+        String lastName = scanner.nextLine();
+        Developer developer = developerController.changeLastName(lastName);
+        if (developer != null) {
+            System.out.println("Данные изменены");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Не удалось изменить имя.");
+    }
+//22.
+    public static void addSkillToDeveloper(Scanner scanner) {
+        String name;
+        System.out.println("Введите имя навыка");
+        name = scanner.nextLine();
+        Skill newSkill = skillController.saveSkill(name);
+        if (newSkill != null) {
+            Developer developer = developerController.getCurrentDeveloper();
+            developer = developerController.addSkillToDeveloper(newSkill);
+            System.out.println("Навык добавлен");
+            System.out.println(developer.toString());
+            return;
+        }
+        System.out.println("Операция не выполнена");
     }
 
     public static void removeSkillFromDeveloper(int id, Scanner scanner) {
@@ -122,39 +253,8 @@ public class ViewHelper {
         System.out.println(developerController.removeAllSkillsFromDeveloper(id));
     }
 
-    public static void removeSkillFromAll(int id) {
-        System.out.println(skillController.removeSkillFromAll(id));
-    }
 
-    public static void blockAccount(int id) {
-        System.out.println(accountController.blockAccount(id));
-    }
 
-    public static void allActive() {
-        System.out.println(accountController.showAllActive());
-    }
 
-    public static void  allDeleted() {
-        System.out.println(accountController.showDeleted());
-    }
 
-    public static void  allBlocked() {
-        System.out.println(accountController.showBlocked());
-    }
-
-    public static void showWithSimilarSkill(Scanner scanner) {
-        System.out.println("Введите ключевое слово для поиска пользователей с похожим навыком");
-        String key;
-        key = scanner.nextLine();
-    }
-
-    public static void addSkillToDeveloper(Scanner scanner) {
-        int id;
-        String skill;
-        System.out.println("Введите id аккаунта");
-        id = readOption(scanner);
-        System.out.println("Введите имя навыка");
-        skill = scanner.nextLine();
-
-    }
 }

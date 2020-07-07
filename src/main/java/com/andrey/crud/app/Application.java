@@ -12,7 +12,7 @@ public class Application {
 
         System.out.println("Добро пожаловать в приложение!");
         System.out.println("*********************************\n");
-        System.out.println("Список существующих разработчиков:");
+        System.out.println("Короткий список данных:");
         showAllInShort();
         showMenu();
 
@@ -27,43 +27,42 @@ public class Application {
 
             switch (option) {
                 case 1 :
+                    System.out.println("Список существующих разработчиков:");
+                    showAllData();
+                    showMenu();
+                    break;
+                case 2:
                     System.out.println("Введите id пользователя");
                     option = readOption(scanner);
                     showDeveloper(option);
                     showSecondaryMenu();
-                    break;
-                case 2:
-                    System.out.println("Введите id аккаунта, который хотите удалить");
-                    option = readOption(scanner);
-                    removeAccount(option);
-                    showMenu();
                     break;
                 case 3:
                     addEntity(scanner);
                     showMenu();
                     break;
                 case 4:
-                    System.out.println("Введите id пользователя, у которого хотите удалить навык");
+                    System.out.println("Введите id пользователя, которого хотите удалить");
                     option = readOption(scanner);
-                    removeSkillFromDeveloper(option,scanner);
-                    showSecondaryMenu();
+                    deleteDeveloper(option);
+                    showMenu();
                     break;
                 case 5:
-                    System.out.println("Введите id пользователя");
+                    System.out.println("Введите id аккаунта, который хотите удалить");
                     option = readOption(scanner);
-                    removeSkillsForOneDeveloper(option);
-                    showSecondaryMenu();
+                    deleteAccount(option);
+                    showMenu();
                     break;
                 case 6:
-                    System.out.println("Введите id навыка(данный навык будет удалён у всех)");
+                    System.out.println("Введите id аккаунта, который хотите заблокировать");
                     option = readOption(scanner);
-                    removeSkillFromAll(option);
+                    blockAccount(option);
                     showMenu();
                     break;
                 case 7:
-                    System.out.println("Введите id аккаунта,который необходимо заблокировать");
+                    System.out.println("Введите id аккаунта,который хотите восстановить");
                     option = readOption(scanner);
-                    blockAccount(option);
+                    recoverAccount(option);
                     showSecondaryMenu();
                     break;
                 case 8:
@@ -79,23 +78,32 @@ public class Application {
                     showMenu();
                     break;
                 case 11:
-                    showWithSimilarSkill(scanner);
+                    showAllExistingSkills();
                     showMenu();
                     break;
                 case 12:
-                    System.out.println("Введите id аккаунта, который нужно восстановить");
+                    System.out.println("Введите id навыка,который хотите удалить");
                     option = readOption(scanner);
-                    recoverAccount();
-                    showSecondaryMenu();
-                    break;
-                case 13:
-                    showAllData();
+                    removeSkillFromAll(option);
                     showMenu();
                     break;
-                case 14:
-
+                case 13:
+                    showWithSimilarSkill(scanner);
+                    showMenu();
                     break;
                 case 20:
+                    changeName(scanner);
+                    showSecondaryMenu();
+                    break;
+                case 21:
+                    changeLastName(scanner);
+                    showSecondaryMenu();
+                    break;
+                case 22:
+                    addSkillToDeveloper(scanner);
+                    showSecondaryMenu();
+                    break;
+                case 30:
                     showMenu();
                     break;
             }

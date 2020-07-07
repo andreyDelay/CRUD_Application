@@ -3,7 +3,6 @@ package com.andrey.crud.repository.IO;
 import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
 import com.andrey.crud.model.Developer;
-import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.DeveloperIORepository;
 import com.andrey.crud.utils.IOUtils;
 
@@ -21,11 +20,12 @@ public class DeveloperRepository implements DeveloperIORepository {
     private final String separator = "=";
 
     @Override
-    public boolean save(Developer obj) throws WriteFileException, ReadFileException {
-        obj.setId(IOUtils.generateID(filepath,separator));
-        String dataToWrite = objectToRepositoryFormat(obj);
+    public Developer save(Developer developer) throws WriteFileException, ReadFileException {
+        developer.setId(IOUtils.generateID(filepath,separator));
+        String dataToWrite = objectToRepositoryFormat(developer);
 
-        return IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.APPEND);
+        IOUtils.writeFile(dataToWrite, filepath, StandardOpenOption.APPEND);
+        return developer;
     }
 
     @Override
@@ -74,36 +74,36 @@ public class DeveloperRepository implements DeveloperIORepository {
     public boolean saveAll(List<Developer> list) throws WriteFileException {
         String dataToWrite = list.stream()
                                 .map(this::objectToRepositoryFormat)
-                                .collect(Collectors.joining("\n"));
+                                .collect(Collectors.joining());
 
         return IOUtils.writeFile(dataToWrite, filepath,StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @Override
-    public boolean update(Long id, Developer obj) throws ReadFileException, WriteFileException {
+    public Developer update(Long id, Developer developer) throws ReadFileException, WriteFileException {
         Map<Long, Developer> developers = findAll();
         for(Map.Entry<Long,Developer> entry: developers.entrySet()) {
-            if (entry.getKey().equals(id))
-                entry.setValue(obj);
-        }
-        String dataToWrite = developers.values().stream()
-                                                .map(this::objectToRepositoryFormat)
-                                                .collect(Collectors.joining("\n"));
+            if (entry.getKey().equals(id)) {
+                entry.setValue(developer);
+                Developer updated = entry.getValue();
 
-        return IOUtils.writeFile(dataToWrite, filepath,StandardOpenOption.TRUNCATE_EXISTING);
+                saveAll(new ArrayList<>(developers.values()));
+                return updated;
+            }
+        }
+        return null;
     }
 
-
     @Override
-    public boolean delete(Long id) throws ReadFileException, WriteFileException {
+    public Developer delete(Long id) throws ReadFileException, WriteFileException {
         Map<Long, Developer> developers = findAll();
         Developer removed = developers.get(id);
         if (removed != null) {
             developers.remove(id);
-            return saveAll(new ArrayList<>(developers.values()));
+            saveAll(new ArrayList<>(developers.values()));
+            return removed;
         }
-
-        return false;
+        return null;
     }
 
     private String objectToRepositoryFormat(Developer object) {

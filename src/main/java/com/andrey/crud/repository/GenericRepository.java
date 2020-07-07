@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface GenericRepository<T, ID> {
 
-    boolean save(T obj) throws WriteFileException, ReadFileException;
+    T save(T obj) throws WriteFileException, ReadFileException;
 
     Optional<T> find(ID id) throws ReadFileException;
 
@@ -18,8 +18,8 @@ public interface GenericRepository<T, ID> {
 
     boolean saveAll(List<T> list) throws WriteFileException;
 
-    boolean update(ID id, T newValue) throws ReadFileException, WriteFileException;
+    T update(ID id, T newValue) throws ReadFileException, WriteFileException;
 
-    boolean delete(ID id) throws ReadFileException, WriteFileException;
+    T delete(ID id) throws ReadFileException, WriteFileException;
 
 }
