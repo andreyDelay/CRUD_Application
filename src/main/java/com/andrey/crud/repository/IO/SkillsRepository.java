@@ -40,7 +40,7 @@ public class SkillsRepository implements SkillIORepository {
      * call findAll() mothod from this class and get Map where keys are Long values with id of
      * Skill objects
      * then it search required id in the Map and if the key is found gets and returns the value
-     * @param id - Long value as identificator of required object
+     * @param id - Long value as id of required object
      * @return
      * @throws ReadFileException
      */
@@ -52,6 +52,13 @@ public class SkillsRepository implements SkillIORepository {
                 .findFirst();
     }
 
+    /**
+     * delete object by id if the id value is present
+     * @param id - Long value as id of required object
+     * @return - deleted object
+     * @throws ReadFileException
+     * @throws WriteFileException
+     */
     @Override
     public Skill delete(Long id) throws ReadFileException, WriteFileException {
         Map<Long,Skill> skills = findAll();
@@ -63,6 +70,12 @@ public class SkillsRepository implements SkillIORepository {
         return null;
     }
 
+    /**
+     * write data from collection of Skills objects into target file
+     * @param list - Collection with objects that must be saved
+     * @return - true if the data successfully written in the target file
+     * @throws WriteFileException
+     */
     @Override
     public boolean saveAll(List<Skill> list) throws WriteFileException {
         String dataToWrite =
@@ -73,6 +86,14 @@ public class SkillsRepository implements SkillIORepository {
         return IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
     }
 
+    /**
+     * Update the old object representation with new value
+     * @param id - id of the old object
+     * @param newValue - new value that must be written instead old value
+     * @return - object as old replaced value
+     * @throws ReadFileException
+     * @throws WriteFileException
+     */
     @Override
     public Skill update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
         Map<Long, Skill> skills = findAll();
@@ -117,7 +138,11 @@ public class SkillsRepository implements SkillIORepository {
         return skills;
     }
 
-
+    /**
+     * accept Skill object and build a String representation of this object
+     * @param skill - Skill object for building
+     * @return - string representation of the object
+     */
     private String objectToRepositoryFormat(Skill skill) {
         StringBuilder result = new StringBuilder();
             result

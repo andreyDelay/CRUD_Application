@@ -76,11 +76,11 @@ public class AccountController {
 
     /**
      * method accepts Account id and AccountStatus, then changes the private field
-     * in Account object with newStatus value, if 
-     * @param id
-     * @param newStatus
-     * @param <ID>
-     * @return
+     * "private AccountStatus status" in Account Class with newStatus value
+     * @param id - id of required object
+     * @param newStatus - new value for found object
+     * @param <ID> - generic type that allow to pass to the method only extends Number's type
+     * @return - changed value
      */
     public<ID extends Number> Account changeAccountStatus(ID id, AccountStatus newStatus) {
         try {
@@ -106,6 +106,12 @@ public class AccountController {
         return null;
     }
 
+    /**
+     * method shows all objects of Account type with required status
+     * if quantity with required status is 0 returns massage with this information
+     * @param requiredStatus - status for searching Accounts with this status
+     * @return - string representation with all Accounts if such objects were found
+     */
     public String showAccountWithRequiredStatus(AccountStatus requiredStatus) {
         try {
             Map<Long,Account> accounts = repository.findAll();

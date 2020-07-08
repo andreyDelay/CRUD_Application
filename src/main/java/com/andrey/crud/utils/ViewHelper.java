@@ -209,6 +209,7 @@ public class ViewHelper {
     public static void showWithSimilarSkill(Scanner scanner) {
         System.out.println("Введите ключевое слово для поиска пользователей с похожим навыком");
         String key;
+        scanner.nextLine();
         key = scanner.nextLine();
         List<Developer> result = developerController.showDevelopersWithKeySkillWord(key);
         if (result.size() == 0) {

@@ -19,6 +19,13 @@ public class DeveloperController {
         return current;
     }
 
+    /**
+     * method creates a new object of Developer type
+     * @param name - name of user
+     * @param lastName - last name of user
+     * @param age - age of user
+     * @return - a new created Developer if all parameters have successfully passed verification
+     */
     public Developer createDeveloper(String name, String lastName,String age) {
         if (!(checkDevName(name) || checkDevName(lastName) || numberChecker(age)))
             return null;
@@ -34,6 +41,12 @@ public class DeveloperController {
         return null;
     }
 
+    /**
+     * delete developer by id if Developer with this id was found
+     * @param developerId
+     * @param <ID>
+     * @return - deleted developer
+     */
     public<ID extends Number> Developer deleteDeveloper(ID developerId) {
         try {
             current = repository.delete(longParser(developerId));
@@ -54,6 +67,10 @@ public class DeveloperController {
         return null;
     }
 
+    /**
+     * show all existing developers in repository
+     * @return - string representation of all developers
+     */
     public String showAllDevelopers() {
         try {
             Map<Long,Developer> developers = repository.findAll();
@@ -103,6 +120,11 @@ public class DeveloperController {
         return null;
     }
 
+    /**
+     * method add new Skill to Developer
+     * @param newSkill - Skill that must be added
+     * @return - Developer with new data
+     */
     public Developer addSkillToDeveloper(Skill newSkill) {
         Set<Skill> skills = current.getSkills();
         if (skills.size() != 0) {
@@ -117,6 +139,12 @@ public class DeveloperController {
         return current;
     }
 
+    /**
+     * removes Skill from Developer
+     * @param skillId
+     * @param <ID>
+     * @return
+     */
     public <ID extends Number>  Developer removeSkillFromDeveloper(ID skillId) {
         try {
             StringBuilder skillNumbers = new StringBuilder();
@@ -145,6 +173,10 @@ public class DeveloperController {
         return null;
     }
 
+    /**
+     * removes all Skills from Developer
+     * @return
+     */
     public Developer removeAllSkillsFromDeveloper() {
         if (current.getSkills().size() == 0)
             return null;
@@ -154,6 +186,11 @@ public class DeveloperController {
         return current;
     }
 
+    /**
+     * removes one skill from all developers
+     * @param skill
+     * @return
+     */
     public int removeSkillFromAll(Skill skill) {
         int counter = 0;
         try {
@@ -181,6 +218,12 @@ public class DeveloperController {
         return counter;
     }
 
+    /**
+     * accept key word for searching similar word in skill names
+     * if this ward was found - Developer object will be added to List
+     * @param keyWord - key word
+     * @return - collection of Developer
+     */
     public List<Developer> showDevelopersWithKeySkillWord(String keyWord) {
         try {
             Map<Long, Developer> developers = repository.findAll();
@@ -194,7 +237,7 @@ public class DeveloperController {
                     Set<Skill> skills = current.getSkills();
 
                     for (Skill s : skills) {
-                        if (s.getSkillName().contains(keyWord)) {
+                        if (s.getSkillName().toLowerCase().contains(keyWord.toLowerCase())) {
                             result.add(entry.getValue());
                             break;
                         }
