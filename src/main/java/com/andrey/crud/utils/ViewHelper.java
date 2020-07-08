@@ -20,6 +20,9 @@ public class ViewHelper {
     private static AccountController accountController = new AccountController();
     private static SkillController skillController = new SkillController();
 
+    /**
+     * Main menu for UI
+     */
     public static void showMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
@@ -42,6 +45,12 @@ public class ViewHelper {
         System.out.println("===============================");
     }
 
+    /**
+     * this menu is shown when only one developer is chosen
+     * all methods work with private fields named as "current" in each controller
+     * private fields "current" usually actualized when menu items 2 or 25 were chosen by the user
+     * then all the items from secondary menu work with this data
+     */
     public static void showSecondaryMenu() {
         System.out.println("===============================");
         System.out.println("Введите номер операции, которую хотите совершить");
@@ -74,7 +83,10 @@ public class ViewHelper {
         }
     }
 
-
+    /**
+     * All methods that may be used by UI from class Application
+     * every point has its own function
+     */
 //1.
     public static void showAllData() {
         System.out.println(developerController.showAllDevelopers());

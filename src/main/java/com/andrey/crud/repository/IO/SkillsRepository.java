@@ -19,6 +19,14 @@ public class SkillsRepository implements SkillIORepository {
 
     private final String separator = "=";
 
+    /**
+     * accepts an object and save it into repository file with method writeFile from IOUtils class
+     * above all incrementing Long id value with method generateID from IOUtils class
+     * @param skill - an object that must be written to the target file
+     * @return - a saved object with incremented id
+     * @throws WriteFileException
+     * @throws ReadFileException
+     */
     @Override
     public Skill save(Skill skill) throws WriteFileException, ReadFileException {
         skill.setID(IOUtils.generateID(filepath,separator));
@@ -28,6 +36,14 @@ public class SkillsRepository implements SkillIORepository {
         return skill;
     }
 
+    /**
+     * call findAll() mothod from this class and get Map where keys are Long values with id of
+     * Skill objects
+     * then it search required id in the Map and if the key is found gets and returns the value
+     * @param id - Long value as identificator of required object
+     * @return
+     * @throws ReadFileException
+     */
     @Override
     public Optional<Skill> find(Long id) throws ReadFileException {
         Map<Long,Skill> skills = findAll();

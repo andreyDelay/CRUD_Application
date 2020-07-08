@@ -7,3 +7,11 @@
 	id:=4
 	name:=sleep at noon
 }
+{
+	id:=5
+	name:=keep silence
+}
+{
+	id:=6
+	name:=test
+}

@@ -17,6 +17,13 @@ public class AccountController {
     private AccountRepository repository = new AccountRepository();
     private Account current;
 
+    /**
+     * accepts id of required object of Account type, calls the method find()
+     * in repository and if Optional class is not empty - writes object into
+     * private field "current", otherwise return null
+     * @param id - Long id of required object
+     * @return - Account or null
+     */
     public Account getAccount(Long id) {
         try {
             Optional<Account> result = repository.find(id);
@@ -29,6 +36,12 @@ public class AccountController {
         return null;
     }
 
+    /**
+     * method creates Account, first of all the accountName is checked
+     * if method checkAccountName return false this method return null
+     * @param accountName - name of Account that must be created
+     * @return - created new object of Account type, may return null
+     */
     public Account createAccount(String accountName) {
         if (!checkAccountName(accountName)) {
             System.out.println("Недопустимое имя аккаунта.");
@@ -37,12 +50,18 @@ public class AccountController {
 
         try {
             current = repository.save(new Account(accountName));
+            return current;
         } catch (ReadFileException | WriteFileException e) {
             System.out.println("Ошибка при работе с базой данных." + e.getMessage());
         }
-        return current;
+        return null;
     }
 
+    /**
+     * Method call repository method delete() with Account id that have to be deleted
+     * @param account - object that must be deleted from repository
+     * @return - deleted object
+     */
     public Account deleteAccount(Account account) {
         try {
             current = repository.delete(account.getId());
@@ -55,6 +74,14 @@ public class AccountController {
         return null;
     }
 
+    /**
+     * method accepts Account id and AccountStatus, then changes the private field
+     * in Account object with newStatus value, if 
+     * @param id
+     * @param newStatus
+     * @param <ID>
+     * @return
+     */
     public<ID extends Number> Account changeAccountStatus(ID id, AccountStatus newStatus) {
         try {
             Optional<Account> result = repository.find(longParser(id));
@@ -88,7 +115,7 @@ public class AccountController {
             if (active.size() == 0)
                 return "в базе нет аккаунтов с таким статусом";
 
-            StringBuilder result = new StringBuilder("Список активных аккаунтов:\n");
+            StringBuilder result = new StringBuilder("Список аккаунтов:\n");
             for (Account a: active) {
                 result.append("id:=")
                         .append(a.getId())

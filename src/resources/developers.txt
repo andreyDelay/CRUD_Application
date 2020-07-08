@@ -7,17 +7,17 @@
 }
 {
 	id:=2
-	firstName:=Oleg
+	firstName:=Grigoriy
 	lastName:=Ivanov
 	age:=36
 	skills:=1,
 }
 {
 	id:=3
-	firstName:=Vasya
+	firstName:=Danil
 	lastName:=Vasilev
 	age:=22
-	skills:=1,
+	skills:=1,5,6,
 }
 {
 	id:=4
@@ -26,4 +26,3 @@
 	age:=22
 	skills:=""
 }
-

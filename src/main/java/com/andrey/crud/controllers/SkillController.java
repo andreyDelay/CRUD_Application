@@ -64,7 +64,7 @@ public class SkillController {
             StringBuilder result = new StringBuilder("Список всех навыков:\n");
             for (Map.Entry<Long,Skill> entry: skills.entrySet()) {
                 result.append("id:=").append(entry.getKey());
-                result.append("name:=").append(entry.getValue().getSkillName());
+                result.append(", name:=").append(entry.getValue().getSkillName()).append("\n");
             }
             return result.toString();
         } catch (ReadFileException e) {
