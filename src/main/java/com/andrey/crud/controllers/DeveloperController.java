@@ -2,7 +2,6 @@ package com.andrey.crud.controllers;
 
 import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
-import com.andrey.crud.model.Account;
 import com.andrey.crud.model.Developer;
 import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.IO.DeveloperRepository;
@@ -45,26 +44,15 @@ public class DeveloperController {
      * delete developer by id if Developer with this id was found
      * @param developerId
      * @param <ID>
-     * @return - deleted developer
      */
-    public<ID extends Number> Developer deleteDeveloper(ID developerId) {
+    public<ID extends Number> void deleteDeveloper(ID developerId) {
         try {
-            current = repository.delete(longParser(developerId));
-
-            AccountController accountController = new AccountController();
-            Account account = accountController.deleteAccount(current.getAccount());
-            if (account == null) {
-                System.out.println("Аккаунт данного пользователя не был удалён из БД");
-            }
-
-            if (current != null)
-                return current;
+            repository.delete(longParser(developerId));
         } catch (WriteFileException e) {
             System.out.println("Ошибка записи изменений в базу данных.");
         } catch (ReadFileException e) {
             System.out.println("Ошибка чтения базы данных.");
         }
-        return null;
     }
 
     /**
@@ -73,10 +61,8 @@ public class DeveloperController {
      */
     public String showAllDevelopers() {
         try {
-            Map<Long,Developer> developers = repository.findAll();
-            return developers.values().stream()
-                    .map(this::developerBuilder)
-                    .filter(Objects::nonNull)
+            List<Developer> developers = repository.findAll();
+            return developers.stream()
                     .map(Developer::toString)
                     .collect(Collectors.joining());
         } catch (ReadFileException e) {
@@ -86,10 +72,8 @@ public class DeveloperController {
 
     public String showAllInShortForm() {
         try {
-            Map<Long,Developer> developers = repository.findAll();
-            return developers.values().stream()
-                    .map(this::developerBuilder)
-                    .filter(Objects::nonNull)
+            List<Developer> developers = repository.findAll();
+            return developers.stream()
                     .map(developer -> {
                         StringBuilder list = new StringBuilder();
                         list.append("id:=").append(developer.getId()).append(", ")
@@ -112,7 +96,7 @@ public class DeveloperController {
             Optional<Developer> result = repository.find(longParser(developerId));
             if (result.isPresent()) {
                 current = result.get();
-                return developerBuilder(current);
+                return current;
             }
         } catch (ReadFileException e) {
             System.out.println("Ошибка чтения базы данных.");
@@ -131,9 +115,6 @@ public class DeveloperController {
             for (Skill s: skills)
                 if (s.getID().equals(newSkill.getID())) return null;
         }
-        StringBuilder skillNumbers = new StringBuilder(current.getNumbersOfSkills());
-        skillNumbers.append(newSkill.getID()).append(",");
-        current.setNumbersOfSkills(skillNumbers.toString());
 
         current.addSkill(newSkill);
         return current;
@@ -147,13 +128,10 @@ public class DeveloperController {
      */
     public <ID extends Number>  Developer removeSkillFromDeveloper(ID skillId) {
         try {
-            StringBuilder skillNumbers = new StringBuilder();
             Skill removed = null;
             Set<Skill> skills = current.getSkills();
             for (Skill s: skills) {
-                if (!s.getID().equals(longParser(skillId))) {
-                    skillNumbers.append(s.getID()).append(",");
-                } else {
+                if (s.getID().equals(longParser(skillId))) {
                     removed = s;
                 }
             }
@@ -163,7 +141,7 @@ public class DeveloperController {
             }
             skills.remove(removed);
             current.setSkills(skills);
-            current = repository.update(current.getId(),current);
+            current = repository.update(current.getId(), current);
             return current;
         } catch (ReadFileException e) {
             System.out.println("Ошибка чтения базы данных." + e.getMessage());
@@ -181,7 +159,6 @@ public class DeveloperController {
         if (current.getSkills().size() == 0)
             return null;
 
-        current.setNumbersOfSkills("\"\"");
         current.setSkills(new HashSet<>());
         return current;
     }
@@ -194,24 +171,15 @@ public class DeveloperController {
     public int removeSkillFromAll(Skill skill) {
         int counter = 0;
         try {
-            Map<Long,Developer> developers = repository.findAll();
-            for (Map.Entry<Long,Developer> map: developers.entrySet()) {
-                StringBuilder skillNumbers = new StringBuilder();
-                Developer current = developerBuilder(map.getValue());
-                Set<Skill> skills = current.getSkills();
-                    for (Skill s : skills) {
-                        if (!s.equals(skill)) {
-                            skillNumbers.append(s.getID()).append(",");
-                        } else {
-                            skills.remove(s);
-                            counter++;
-                        }
+            List<Developer> developers = repository.findAll();
+            for (Developer dev: developers) {
+                Set<Skill> skills = dev.getSkills();
+                    if (skills.remove(skill)) {
+                        dev.setSkills(skills);
+                        counter++;
                     }
-                    current.setNumbersOfSkills(skillNumbers.toString());
-                    map.setValue(current);
-
-            }
-            repository.saveAll(new ArrayList<>(developers.values()));
+                }
+            repository.saveAll(developers);
         } catch (ReadFileException | WriteFileException e) {
             System.out.println("Ошибка при работе с базой данных в методе removeSkillFromAll()");
         }
@@ -226,19 +194,18 @@ public class DeveloperController {
      */
     public List<Developer> showDevelopersWithKeySkillWord(String keyWord) {
         try {
-            Map<Long, Developer> developers = repository.findAll();
-            StringBuilder str = new StringBuilder();
+            List<Developer> developers = repository.findAll();
+
             if (developers.size() == 0)
                 return null;
             List<Developer> result = new ArrayList<>();
-            for (Map.Entry<Long,Developer> entry: developers.entrySet()) {
-                current = developerBuilder(entry.getValue());
-                if (current != null) {
-                    Set<Skill> skills = current.getSkills();
+            for (Developer developer: developers) {
+                if (developer != null) {
+                    Set<Skill> skills = developer.getSkills();
 
                     for (Skill s : skills) {
                         if (s.getSkillName().toLowerCase().contains(keyWord.toLowerCase())) {
-                            result.add(entry.getValue());
+                            result.add(developer);
                             break;
                         }
                     }
@@ -283,31 +250,31 @@ public class DeveloperController {
         return null;
     }
 
-    private Developer developerBuilder(Developer developer) {
-
-        if (developer.getNumbersOfSkills().contains(",")) {
-            SkillController skillController = new SkillController();
-            String[] skillNumbers = developer.getNumbersOfSkills().split(",");
-            try {
-                Map<Long, Skill> allSkills = skillController.allSkills();
-                for (int i = 0; i < skillNumbers.length; i++) {
-                    Long skillId = Long.parseLong(skillNumbers[i]);
-                    Skill skill = allSkills.get(skillId);
-                    developer.addSkill(skill);
-                }
-            } catch (ReadFileException e) {
-                System.out.println("Не удалось прочитать навыки из базы " + e.getMessage());
-            }
-        }
-
-        AccountController accountController = new AccountController();
-        Account account = accountController.getAccount(developer.getId());
-        if (account == null) {
-            return null;
-        }
-        developer.setAccount(account);
-        return developer;
-    }
+//    private Developer developerBuilder(Developer developer) {
+//
+//        if (developer.getNumbersOfSkills().contains(",")) {
+//            SkillController skillController = new SkillController();
+//            String[] skillNumbers = developer.getNumbersOfSkills().split(",");
+//            try {
+//                Map<Long, Skill> allSkills = skillController.allSkills();
+//                for (int i = 0; i < skillNumbers.length; i++) {
+//                    Long skillId = Long.parseLong(skillNumbers[i]);
+//                    Skill skill = allSkills.get(skillId);
+//                    developer.addSkill(skill);
+//                }
+//            } catch (ReadFileException e) {
+//                System.out.println("Не удалось прочитать навыки из базы " + e.getMessage());
+//            }
+//        }
+//
+//        AccountController accountController = new AccountController();
+//        Account account = accountController.getAccount(developer.getId());
+//        if (account == null) {
+//            return null;
+//        }
+//        developer.setAccount(account);
+//        return developer;
+//    }
 
     private boolean checkDevName(String name) {
         String tmp = name.trim();

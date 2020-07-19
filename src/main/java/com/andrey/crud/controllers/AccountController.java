@@ -8,7 +8,6 @@ import com.andrey.crud.model.AccountStatus;
 import com.andrey.crud.repository.IO.AccountRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,21 +56,15 @@ public class AccountController {
         return null;
     }
 
-    /**
-     * Method call repository method delete() with Account id that have to be deleted
-     * @param account - object that must be deleted from repository
-     * @return - deleted object
-     */
-    public Account deleteAccount(Account account) {
+
+    public void deleteAccount(int id) {
         try {
-            current = repository.delete(account.getId());
-            return current;
+            repository.delete((long) id);
         } catch (ReadFileException e) {
             System.out.println("Ошибка чтения базы данных." + e.getMessage());
         } catch (WriteFileException e) {
             System.out.println("Ошибка записи в базу данных." + e.getMessage());
         }
-        return null;
     }
 
     /**
@@ -114,8 +107,8 @@ public class AccountController {
      */
     public String showAccountWithRequiredStatus(AccountStatus requiredStatus) {
         try {
-            Map<Long,Account> accounts = repository.findAll();
-            List<Account> active = accounts.values().stream()
+            List<Account> accounts = repository.findAll();
+            List<Account> active = accounts.stream()
                                             .filter(account -> account.getStatus().toString().equals(requiredStatus.toString()))
                                             .collect(Collectors.toList());
             if (active.size() == 0)

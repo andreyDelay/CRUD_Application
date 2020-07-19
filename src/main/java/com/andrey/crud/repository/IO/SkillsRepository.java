@@ -37,7 +37,7 @@ public class SkillsRepository implements SkillIORepository {
     }
 
     /**
-     * call findAll() mothod from this class and get Map where keys are Long values with id of
+     * call findAll() method from this class and get Map where keys are Long values with id of
      * Skill objects
      * then it search required id in the Map and if the key is found gets and returns the value
      * @param id - Long value as id of required object
@@ -46,10 +46,58 @@ public class SkillsRepository implements SkillIORepository {
      */
     @Override
     public Optional<Skill> find(Long id) throws ReadFileException {
-        Map<Long,Skill> skills = findAll();
-        return skills.values().stream()
-                .filter(value -> value.getID().equals(id))
-                .findFirst();
+        Iterator<String> iterator = IOUtils.readFile(filepath).iterator();
+        String currentLine;
+        while (iterator.hasNext()) {
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
+                return Optional.of(builder(iterator, currentLine));
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Skill> findAll() throws ReadFileException {
+        Iterator<String> iterator = IOUtils.readFile(filepath).iterator();
+        List<Skill> skills = new ArrayList<>();
+        String currentLine;
+        while (iterator.hasNext()) {
+            currentLine = iterator.next();
+            if (currentLine.equals("{")) {
+                currentLine = iterator.next();
+                skills.add(builder(iterator, currentLine));
+            }
+        }
+        return skills;
+    }
+
+    /**
+     * Update the old object representation with new value
+     * @param id - id of the old object
+     * @param newValue - new value that must be written instead old value
+     * @return - object as old replaced value
+     * @throws ReadFileException
+     * @throws WriteFileException
+     */
+    @Override
+    public Skill update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
+        List<String> rowsFromRepo = IOUtils.readFile(filepath);
+        Iterator<String> iterator = rowsFromRepo.iterator();
+        Skill oldValue = null;
+        int index = 0;
+        String currentLine;
+        while (iterator.hasNext()) {
+            index++;
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
+                oldValue = builder(iterator, currentLine);
+                updater(rowsFromRepo, newValue, index);
+                String dataToWrite = String.join("",rowsFromRepo);
+                IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
+            }
+        }
+        return oldValue;
     }
 
     /**
@@ -60,14 +108,24 @@ public class SkillsRepository implements SkillIORepository {
      * @throws WriteFileException
      */
     @Override
-    public Skill delete(Long id) throws ReadFileException, WriteFileException {
-        Map<Long,Skill> skills = findAll();
-        Skill removed = skills.remove(id);
-        if (removed != null) {
-            saveAll(new ArrayList<>(skills.values()));
-            return removed;
+    public void delete(Long id) throws ReadFileException, WriteFileException {
+        List<String> rowsFromRepo = IOUtils.readFile(filepath);
+        Iterator<String> iterator = rowsFromRepo.iterator();
+        int index = 0;
+        String currentLine;
+        while (iterator.hasNext()) {
+            index++;
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
+                rowsFromRepo.remove(index - 1);
+                rowsFromRepo.remove(index);
+                rowsFromRepo.remove(index + 1);
+                rowsFromRepo.remove(index + 2);
+
+                String dataToWrite = String.join("\n",rowsFromRepo);
+                IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
+            }
         }
-        return null;
     }
 
     /**
@@ -87,55 +145,50 @@ public class SkillsRepository implements SkillIORepository {
     }
 
     /**
-     * Update the old object representation with new value
-     * @param id - id of the old object
-     * @param newValue - new value that must be written instead old value
-     * @return - object as old replaced value
-     * @throws ReadFileException
-     * @throws WriteFileException
+     *
+     * @param allData
+     * @param newSkill
+     * @param index
      */
-    @Override
-    public Skill update(Long id, Skill newValue) throws ReadFileException, WriteFileException {
-        Map<Long, Skill> skills = findAll();
-        for(Map.Entry<Long, Skill> entry: skills.entrySet()) {
-            if (entry.getKey().equals(id)) {
-                entry.setValue(newValue);
-                Skill updated = entry.getValue();
-                saveAll(new ArrayList<>(skills.values()));
-                return updated;
-            }
-        }
-            return null;
+    private void updater(List<String> allData,Skill newSkill, int index) {
+        StringBuilder newData = new StringBuilder();
+        newData
+                .append("\t")
+                .append("name:=").append(newSkill.getSkillName()).append("\n")
+                .append("}")
+                .append("\n");
+
+        allData.remove(index + 1);
+        allData.set(index + 2, newData.toString());
     }
 
-    @Override
-    public Map<Long,Skill> findAll() throws ReadFileException {
-        List<String> rows = IOUtils.readFile(filepath);
-        Iterator<String> iterator = rows.iterator();
-        List<Skill> list = new ArrayList<>();
-        while (iterator.hasNext()) {
-            String current = iterator.next();
-            if (current.equals("{")) {
-                String [][] tmp = new String[2][2];
-                int cnt = 0;
-                current = iterator.next().trim();
-                while (!current.equals("}")) {
-                    tmp[cnt++] = current.split(separator);
-                    current = iterator.next().trim();
-                }
-                list.add(new Skill(
-                            Long.parseLong(tmp[0][1]),
-                            tmp[1][1])
-                        );
-            }
+    /**
+     * //TODO сделать описание
+     * @param iterator
+     * @param currentLine
+     * @return
+     */
+    private Skill builder(Iterator<String> iterator, String currentLine) {
+        String [][] dataForSkillObject = new String[2][2];
+        int counter = 0;
+
+        while (!currentLine.equals("}")) {
+            dataForSkillObject[counter++] = currentLine.split(separator);
+            currentLine = iterator.next().trim();
         }
-        Map<Long,Skill> skills = list.stream()
-                                    .collect(Collectors.toMap(
-                                            Skill::getID,
-                                            Function.identity(),
-                                            (s1,s2) -> s1,
-                                            HashMap::new));
-        return skills;
+
+        return new Skill(Long.parseLong(dataForSkillObject[0][1]), dataForSkillObject[1][1]);
+    }
+
+    /**
+     *
+     * @param currentLine
+     * @param requiredId
+     * @return
+     */
+    private boolean checkId(String currentLine, String requiredId) {
+        String [] splitter = currentLine.split("=");
+        return  requiredId.equals(splitter[1].trim());
     }
 
     /**

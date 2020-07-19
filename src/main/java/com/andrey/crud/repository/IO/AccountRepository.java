@@ -4,6 +4,7 @@ import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
 import com.andrey.crud.model.Account;
 import com.andrey.crud.model.AccountStatus;
+import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.AccountIORepository;
 import com.andrey.crud.utils.IOUtils;
 
@@ -11,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AccountRepository implements AccountIORepository<Account> {
@@ -23,7 +23,6 @@ public class AccountRepository implements AccountIORepository<Account> {
 
     @Override
     public Account save(Account account) throws WriteFileException, ReadFileException {
-        //TODO можно читать мапу и записывать если нет объекта, передавая в метод saveAll()
         account.setId(IOUtils.generateID(filepath,separator));
         String dataToWrite = objectToRepositoryFormat(account);
 
@@ -34,43 +33,29 @@ public class AccountRepository implements AccountIORepository<Account> {
 
     @Override
     public Optional<Account> find(Long id) throws ReadFileException {
-        Map<Long, Account> accounts = findAll();
-        Account required = accounts.get(id);
-        if (Objects.nonNull(required)) {
-            return Optional.of(required);
+        Iterator<String> iterator = IOUtils.readFile(filepath).iterator();
+        String currentLine;
+        while (iterator.hasNext()) {
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))){
+                return Optional.of(builder(iterator, currentLine));
+            }
         }
         return Optional.empty();
     }
 
     @Override
-    public Map<Long, Account> findAll() throws ReadFileException{
-        List<String> fromRepository = IOUtils.readFile(filepath);
-        Iterator<String> rows = fromRepository.iterator();
-        List<Account> list = new ArrayList<>();
-        while (rows.hasNext()) {
-            String current = rows.next();
-            if (current.equals("{")){
-                String [][] tmp = new String[3][2];
-                int cnt = 0;
-                current = rows.next().trim();
-                while (!current.equals("}")) {
-                    tmp[cnt++] = current.split(separator);
-                    current = rows.next().trim();
-                }
-                list.add(new Account(
-                            Long.parseLong(tmp[0][1]),
-                            tmp[1][1],
-                            AccountStatus.valueOf(tmp[2][1]))
-                                    );
+    public List<Account> findAll() throws ReadFileException{
+        Iterator<String> iterator = IOUtils.readFile(filepath).iterator();
+        List<Account> accounts = new ArrayList<>();
+        String currentLine;
+        while (iterator.hasNext()) {
+            currentLine = iterator.next().trim();
+            if (currentLine.equals("{")){
+                currentLine = iterator.next().trim();
+                accounts.add(builder(iterator, currentLine));
             }
         }
-        Map<Long, Account> accounts = list.stream()
-                                        .collect(
-                                        Collectors.toMap(
-                                        Account::getId,
-                                        Function.identity(),
-                                        (a1,a2) -> a1,
-                                        HashMap::new));
         return accounts;
     }
 
@@ -83,29 +68,76 @@ public class AccountRepository implements AccountIORepository<Account> {
     }
 
     @Override
-    public Account update(Long id, Account account) throws WriteFileException, ReadFileException {
-        Map<Long, Account> accounts = findAll();
-        for (Map.Entry<Long,Account> entry: accounts.entrySet()) {
-            if (entry.getKey().equals(id)) {
-                entry.setValue(account);
-                Account updated = entry.getValue();
-                saveAll(new ArrayList<>(accounts.values()));
-                return updated;
+    public Account update(Long id, Account newAccount) throws WriteFileException, ReadFileException {
+        List<String> fromRepository = IOUtils.readFile(filepath);
+        Iterator<String> iterator = fromRepository.iterator();
+        Account oldAccount = null;
+        int index = 0;
+        String currentLine;
+        while (iterator.hasNext()) {
+            index++;
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
+                oldAccount = builder(iterator, currentLine);
+                updater(fromRepository, newAccount, index);
+                String dataToWrite = String.join("",fromRepository);
+                IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
             }
         }
-        return null;
+        return oldAccount;
     }
 
     @Override
-    public Account delete(Long id) throws WriteFileException, ReadFileException {
-        Map<Long, Account> accounts = findAll();
-        Account removed = accounts.get(id);
-        if (removed != null) {
-            accounts.remove(id);
-            saveAll(new ArrayList<>(accounts.values()));
-            return removed;
+    public void delete(Long id) throws WriteFileException, ReadFileException {
+        List<String> fromRepository = IOUtils.readFile(filepath);
+        Iterator<String> iterator = fromRepository.iterator();
+        int index = 0;
+        String currentLine;
+        while (iterator.hasNext()) {
+            index++;
+            currentLine = iterator.next().trim();
+            if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
+                fromRepository.remove(index - 1);
+                fromRepository.remove(index);
+                fromRepository.remove(index + 1);
+                fromRepository.remove(index + 2);
+                fromRepository.remove(index + 3);
+
+                String dataToWrite = String.join("\n",fromRepository);
+                IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
+            }
         }
-        return null;
+    }
+
+    private void updater(List<String> rows, Account newValue, int index) {
+        StringBuilder newData = new StringBuilder();
+        newData
+                .append("\t").append("name:=").append(newValue.getAccountName()).append("\n")
+                .append("\t").append("status:=").append(newValue.getStatus().toString()).append("\n")
+                .append("}")
+                .append("\n");
+
+        rows.remove(index + 1);
+        rows.remove(index + 2);
+        rows.set(index + 3, newData.toString());
+    }
+
+    private boolean checkId(String currentLine, String requiredId) {
+        String [] splitter = currentLine.split("=");
+        return  requiredId.equals(splitter[1].trim());
+    }
+
+    private Account builder(Iterator<String> iterator, String currentLine) {
+        String [][] dataForAccount = new String[3][2];
+        int counter = 0;
+        while (!currentLine.equals("}")) {
+            dataForAccount[counter++] = currentLine.split(separator);
+            currentLine = iterator.next().trim();
+        }
+        return new Account(Long.parseLong(dataForAccount[0][1]),
+                    dataForAccount[1][1],
+                    AccountStatus.valueOf(dataForAccount[2][1])
+                    );
     }
 
     private String objectToRepositoryFormat(Account account) {

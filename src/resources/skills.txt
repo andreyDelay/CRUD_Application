@@ -2,7 +2,6 @@
 	id:=1
 	name:=write Java code
 }
-
 {
 	id:=4
 	name:=sleep at noon

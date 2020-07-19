@@ -11,18 +11,17 @@ public class Developer {
     private String lastName;
     private int age;
 
-    private String numbersOfSkills = "";
-
     private Set<Skill> skills = new HashSet<>();
     private Account account;
 
-    public Developer(Long id,String firstName,String lastName, int age, String numbersOfSkills)
+    public Developer(Long id,String firstName,String lastName, int age, Set<Skill> skills, Account account)
     {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.numbersOfSkills = numbersOfSkills;
+        this.skills = skills;
+        this.account = account;
     }
 
     public Developer(String firstName,String lastName, int age)
@@ -32,20 +31,11 @@ public class Developer {
         this.age = age;
     }
 
-    public String getNumbersOfSkills() {
-        return numbersOfSkills;
-    }
-    public void setNumbersOfSkills(String numbersOfSkills) {
-        this.numbersOfSkills = numbersOfSkills;
-    }
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-    public void setAge(int age) {
-        this.age = age;
     }
     public void setAccount(Account account) {
         this.account = account;

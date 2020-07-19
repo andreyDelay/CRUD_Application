@@ -1,28 +1,14 @@
 {
-	id:=1
-	firstName:=Andrey
-	lastName:=Bezruk
-	age:=31
-	skills:=1,
+    id:=1
+    firstName:=Andrey
+    lastName:=Bezruk
+    age:=31
+    skills:=1,
 }
 {
-	id:=2
-	firstName:=Grigoriy
-	lastName:=Ivanov
+    id:=2
+	firstName:=Anna
+	lastName:=Vasileva
 	age:=36
-	skills:=1,
-}
-{
-	id:=3
-	firstName:=Danil
-	lastName:=Vasilev
-	age:=22
-	skills:=1,5,6,
-}
-{
-	id:=4
-	firstName:=Alexandr
-	lastName:=Alexandrov
-	age:=22
-	skills:=""
+	skills:=
 }

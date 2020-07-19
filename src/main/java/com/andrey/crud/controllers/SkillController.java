@@ -6,6 +6,7 @@ import com.andrey.crud.exeptions.WriteFileException;
 import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.IO.SkillsRepository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,10 +37,10 @@ public class SkillController {
             if (!checkSkillName(name))
                 return null;
 
-            Map<Long,Skill> skills = repository.findAll();
-            for (Map.Entry<Long,Skill> entry: skills.entrySet()) {
-                if (entry.getValue().getSkillName().equalsIgnoreCase(name)) {
-                    current = entry.getValue();
+            List<Skill> skills = repository.findAll();
+            for (Skill s: skills) {
+                if (s.getSkillName().equalsIgnoreCase(name)) {
+                    current = s;
                     return current;
                 }
             }
@@ -56,15 +57,15 @@ public class SkillController {
 
     public String showAllSkills() {
         try {
-            Map<Long,Skill> skills = repository.findAll();
+            List<Skill> skills = repository.findAll();
             if (skills.size() == 0) {
                 System.out.println("В базе нет навыков");
                 return null;
             }
             StringBuilder result = new StringBuilder("Список всех навыков:\n");
-            for (Map.Entry<Long,Skill> entry: skills.entrySet()) {
-                result.append("id:=").append(entry.getKey());
-                result.append(", name:=").append(entry.getValue().getSkillName()).append("\n");
+            for (Skill s: skills) {
+                result.append("id:=").append(s.getID());
+                result.append(", name:=").append(s.getSkillName()).append("\n");
             }
             return result.toString();
         } catch (ReadFileException e) {
@@ -73,7 +74,7 @@ public class SkillController {
        return null;
     }
 
-    public Map<Long,Skill> allSkills() throws ReadFileException {
+    public List<Skill> allSkills() throws ReadFileException {
         return repository.findAll();
     }
 

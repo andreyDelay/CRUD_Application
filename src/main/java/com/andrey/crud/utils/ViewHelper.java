@@ -7,10 +7,7 @@ import com.andrey.crud.model.Account;
 import com.andrey.crud.model.AccountStatus;
 import com.andrey.crud.model.Developer;
 import com.andrey.crud.model.Skill;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
-import org.w3c.dom.ls.LSOutput;
 
-import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -134,15 +131,10 @@ public class ViewHelper {
     }
 //4.
     public static void deleteDeveloper(int id) {
-        Developer developer = developerController.deleteDeveloper(id);
-        if (developer != null) {
-            System.out.println("Пользователь " +
-                                developer.getLastName() + " " +
-                                developer.getLastName() + " " +
-                                "удалён");
-            return;
-        }
-        System.out.println("Операция не выполнена");
+        developerController.deleteDeveloper(id);
+        accountController.deleteAccount(id);
+
+        System.out.println("Данные удалены!");
     }
 //5.
     public static void deleteAccount(int id) {
