@@ -2,6 +2,7 @@ package com.andrey.crud.controllers;
 
 import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
+import com.andrey.crud.model.Account;
 import com.andrey.crud.model.Developer;
 import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.IO.DeveloperRepository;
@@ -25,12 +26,13 @@ public class DeveloperController {
      * @param age - age of user
      * @return - a new created Developer if all parameters have successfully passed verification
      */
-    public Developer createDeveloper(String name, String lastName,String age) {
+    public Developer createDeveloper(String name, String lastName, String age, Account account) {
         if (!(checkDevName(name) || checkDevName(lastName) || numberChecker(age)))
             return null;
 
         try {
             current = new Developer(name,lastName,Integer.parseInt(age));
+            current.setAccount(account);
             return repository.save(current);
         } catch (ReadFileException e) {
             System.out.println("Ошибка при чтении базы данных." + e.getMessage());
@@ -62,6 +64,7 @@ public class DeveloperController {
     public String showAllDevelopers() {
         try {
             List<Developer> developers = repository.findAll();
+            if (developers.size() == 0) return "Нет данных.";
             return developers.stream()
                     .map(Developer::toString)
                     .collect(Collectors.joining());
@@ -73,6 +76,7 @@ public class DeveloperController {
     public String showAllInShortForm() {
         try {
             List<Developer> developers = repository.findAll();
+            if (developers.size() == 0) return "Нет данных.";
             return developers.stream()
                     .map(developer -> {
                         StringBuilder list = new StringBuilder();
@@ -111,12 +115,21 @@ public class DeveloperController {
      */
     public Developer addSkillToDeveloper(Skill newSkill) {
         Set<Skill> skills = current.getSkills();
-        if (skills.size() != 0) {
+        if (skills == null) {
+            skills = new HashSet<>();
+            skills.add(newSkill);
+        } else {
             for (Skill s: skills)
                 if (s.getID().equals(newSkill.getID())) return null;
         }
 
-        current.addSkill(newSkill);
+        skills.add(newSkill);
+        current.setSkills(skills);
+        try {
+            repository.update(current.getId(), current);
+        } catch (ReadFileException | WriteFileException e) {
+            System.out.println("Добавленные данные не были сохранены." + e);
+        }
         return current;
     }
 
@@ -141,7 +154,7 @@ public class DeveloperController {
             }
             skills.remove(removed);
             current.setSkills(skills);
-            current = repository.update(current.getId(), current);
+            repository.update(current.getId(), current);
             return current;
         } catch (ReadFileException e) {
             System.out.println("Ошибка чтения базы данных." + e.getMessage());
@@ -202,7 +215,7 @@ public class DeveloperController {
             for (Developer developer: developers) {
                 if (developer != null) {
                     Set<Skill> skills = developer.getSkills();
-
+                    if (skills != null)
                     for (Skill s : skills) {
                         if (s.getSkillName().toLowerCase().contains(keyWord.toLowerCase())) {
                             result.add(developer);

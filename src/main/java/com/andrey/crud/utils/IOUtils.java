@@ -69,7 +69,7 @@ public class IOUtils {
             List<String> rows = readFile(sourceFile);
             Optional<Long> result = rows.stream()
                     .filter(row -> row.length() > 5)
-                    .filter(row -> row.contains("id"))
+                    .filter(row -> row.contains("id:"))
                     .map(row -> row.split(separator))
                     .map(array -> Long.parseLong(array[1]))
                     .max(Long::compareTo);

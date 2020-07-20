@@ -107,13 +107,8 @@ public class DeveloperRepository implements DeveloperIORepository {
             index ++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                rowsFromRepo.remove(index -1);
-                rowsFromRepo.remove(index);
-                rowsFromRepo.remove(index + 1);
-                rowsFromRepo.remove(index + 2);
-                rowsFromRepo.remove(index + 3);
-                rowsFromRepo.remove(index + 4);
-                rowsFromRepo.remove(index + 5);
+                for (int i = 0; i < 7; i++)
+                    rowsFromRepo.remove(index -1);
 
                 String dataToWrite = String.join("", rowsFromRepo);
                 IOUtils.writeFile(dataToWrite, filepath,StandardOpenOption.TRUNCATE_EXISTING);
@@ -136,7 +131,7 @@ public class DeveloperRepository implements DeveloperIORepository {
                         .append("\t").append("firstName:=").append(newDeveloper.getFirstName()).append("\n")
                         .append("\t").append("lastName:=").append(newDeveloper.getLastName()).append("\n")
                         .append("\t").append("age:=").append(newDeveloper.getAge()).append("\n")
-                        .append("\t").append("skills:=").append(numbersOfSkills(newDeveloper)).append("\n")
+                        .append("\t").append(numbersOfSkills(newDeveloper)).append("\n")
                         .append("}").append("\n");
         for (int i = 0; i < 4; i++)
             allData.remove(index);
@@ -247,7 +242,7 @@ public class DeveloperRepository implements DeveloperIORepository {
                     .append("\t")
                     .append("age:=").append(object.getAge()).append("\n")
                     .append("\t")
-                    .append("skills:=").append(numbersOfSkills(object)).append("\n")
+                    .append(numbersOfSkills(object)).append("\n")
                     .append("}\n");
 
         return dataToWrite.toString();

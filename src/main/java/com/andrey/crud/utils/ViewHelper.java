@@ -109,6 +109,7 @@ public class ViewHelper {
 
         String [] data = option.split(",");
         for (int i = 0; i < data.length; i++) {
+            data[i] = data[i].trim();
             if (data[i].length() == 0) {
                 System.out.println("Некорректные данные");
                 return;
@@ -119,7 +120,7 @@ public class ViewHelper {
             System.out.println("Не удалось создать и сохранить аккаунт");
             return;
         }
-        Developer developer = developerController.createDeveloper(data[1],data[2],data[3]);
+        Developer developer = developerController.createDeveloper(data[1],data[2],data[3], account);
         if (developer != null) {
             developer.setAccount(account);
             System.out.println("Пользователь добавлен.");

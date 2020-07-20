@@ -3,14 +3,6 @@
 	name:=write Java code
 }
 {
-	id:=4
-	name:=sleep at noon
-}
-{
-	id:=5
-	name:=keep silence
-}
-{
-	id:=6
-	name:=test
+	id:=2
+	name:=dancing all night
 }

@@ -1,25 +1,31 @@
+
 {
 	id:=1
-	name:=admin
+	name:=vano
 	status:=ACTIVE
 }
 {
 	id:=2
-	name:=welder
-	status:=ACTIVE
-}
-{
-	id:=3
-	name:=barakuda
-	status:=BANNED
-}
-{
-	id:=4
 	name:=sanya666
 	status:=ACTIVE
 }
 {
+	id:=3
+	name:=segj_01
+	status:=ACTIVE
+}
+{
+	id:=4
+	name:=serj_01
+	status:=ACTIVE
+}
+{
 	id:=5
-	name:=sasha
+	name:=serj_01
+	status:=ACTIVE
+}
+{
+	id:=6
+	name:=serj_01
 	status:=ACTIVE
 }

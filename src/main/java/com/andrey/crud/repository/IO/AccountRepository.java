@@ -80,8 +80,9 @@ public class AccountRepository implements AccountIORepository<Account> {
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
                 oldAccount = builder(iterator, currentLine);
                 updater(fromRepository, newAccount, index);
-                String dataToWrite = String.join("",fromRepository);
+                String dataToWrite = String.join("\n",fromRepository);
                 IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
+                break;
             }
         }
         return oldAccount;
@@ -97,11 +98,9 @@ public class AccountRepository implements AccountIORepository<Account> {
             index++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                fromRepository.remove(index - 1);
-                fromRepository.remove(index);
-                fromRepository.remove(index + 1);
-                fromRepository.remove(index + 2);
-                fromRepository.remove(index + 3);
+                for (int i = 0; i < 5; i++)
+                    fromRepository.remove(index -1);
+
 
                 String dataToWrite = String.join("\n",fromRepository);
                 IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
@@ -116,10 +115,10 @@ public class AccountRepository implements AccountIORepository<Account> {
                 .append("\t").append("status:=").append(newValue.getStatus().toString()).append("\n")
                 .append("}")
                 .append("\n");
+        for (int i = 0; i < 2; i++)
+            rows.remove(index);
 
-        rows.remove(index + 1);
-        rows.remove(index + 2);
-        rows.set(index + 3, newData.toString());
+        rows.set(index, newData.toString());
     }
 
     private boolean checkId(String currentLine, String requiredId) {

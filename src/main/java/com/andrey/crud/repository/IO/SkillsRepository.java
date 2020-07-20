@@ -117,13 +117,12 @@ public class SkillsRepository implements SkillIORepository {
             index++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                rowsFromRepo.remove(index - 1);
-                rowsFromRepo.remove(index);
-                rowsFromRepo.remove(index + 1);
-                rowsFromRepo.remove(index + 2);
+                for (int i = 0; i < 4; i++)
+                    rowsFromRepo.remove(index - 2);
 
                 String dataToWrite = String.join("\n",rowsFromRepo);
                 IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);
+                break;
             }
         }
     }
@@ -158,8 +157,8 @@ public class SkillsRepository implements SkillIORepository {
                 .append("}")
                 .append("\n");
 
-        allData.remove(index + 1);
-        allData.set(index + 2, newData.toString());
+        allData.remove(index);
+        allData.set(index, newData.toString());
     }
 
     /**
