@@ -20,11 +20,13 @@ public class DeveloperController {
     }
 
     /**
-     * method creates a new object of Developer type
-     * @param name - name of user
-     * @param lastName - last name of user
-     * @param age - age of user
-     * @return - a new created Developer if all parameters have successfully passed verification
+     * method accepts three three string that represent parameters required to create
+     * a new object of Developer type. These parameter firstly checked by method checkDevName()
+     * and if this method returns true - object of type Developer will be created.
+     * @param name - name new of user.
+     * @param lastName - last name new of user.
+     * @param age - age of new user.
+     * @return - a new object of Developer type.
      */
     public Developer createDeveloper(String name, String lastName, String age, Account account) {
         if (!(checkDevName(name) || checkDevName(lastName) || numberChecker(age)))
@@ -43,9 +45,11 @@ public class DeveloperController {
     }
 
     /**
-     * delete developer by id if Developer with this id was found
-     * @param developerId
-     * @param <ID>
+     * Accepts int value of Developer object that must be deleted from the repository,
+     * call method delete() of DeveloperRepository , and if the id is present in repo file
+     * all data for required developer will be removed from the repo.
+     * @param developerId - id of required object.
+     * @param <ID> -  generic type that allow to pass to the method only extends Number's type.
      */
     public<ID extends Number> void deleteDeveloper(ID developerId) {
         try {
@@ -58,8 +62,10 @@ public class DeveloperController {
     }
 
     /**
-     * show all existing developers in repository
-     * @return - string representation of all developers
+     * Method shows all existing developers from repository file.
+     * Call method findAll() of DeveloperRepository and get a collection of Developers
+     * @return - string representation of all developers from collection,
+     * if collection is empty returns string result "Нет данных."
      */
     public String showAllDevelopers() {
         try {
@@ -73,6 +79,12 @@ public class DeveloperController {
         }
     }
 
+    /**
+     * When application is started this method read repository file and get a collection with
+     * all existing developers, then represent it as string in short form to show to user start data.
+     * @return - string representation of all developers from collection in short form,
+     * if collection is empty returns string result "Нет данных.".
+     */
     public String showAllInShortForm() {
         try {
             List<Developer> developers = repository.findAll();
@@ -91,6 +103,16 @@ public class DeveloperController {
         }
     }
 
+    /**
+     * Accepts id value of required object and verify this id by method numberChecker()
+     * if the method returns true method find() of DeveloperRepository will be called.
+     * If this id is present in the repository file returned value will be assigned to private filed
+     * private Developer current and will be returned.
+     * @param developerId - id of required object.
+     * @param <ID> - generic type that allow to pass to the method only extends Number's type.
+     * @return - object of Developer type, if object with required id is not present in the.
+     * repository file returns null.
+     */
     public<ID extends Number> Developer showOneDeveloper(ID developerId) {
         if (!numberChecker(developerId)) {
             System.out.println("Неверный id пользователя");
@@ -109,9 +131,13 @@ public class DeveloperController {
     }
 
     /**
-     * method add new Skill to Developer
-     * @param newSkill - Skill that must be added
-     * @return - Developer with new data
+     * Accepts object of Skill type, gets Set<Skill> from current Developer, if Set is null
+     * creates new HashSet() and add the incoming skill object to this HashSet, if Set is not null
+     * method checks whether the object present into private
+     * field Set<Skill> skills of current Developer or not. If skill is already present into Set returns null, if not
+     * the skill will be added to Set and new data will bew written into repository file.
+     * @param newSkill - Skill that must be added.
+     * @return - Developer with new data, if skill wasn't added returns null.
      */
     public Developer addSkillToDeveloper(Skill newSkill) {
         Set<Skill> skills = current.getSkills();
@@ -134,10 +160,13 @@ public class DeveloperController {
     }
 
     /**
-     * removes Skill from Developer
-     * @param skillId
-     * @param <ID>
-     * @return
+     * Accepts id value of object that have to be extends Number type. Then get Set<Skill> from current
+     * Developer and check if Set contains the object of Skill type with this id. If object is present
+     * in the Set it will be removed and Developer with changes will be written to repository file.
+     * If object with the id is not present returns null.
+     * @param skillId - id of Skill that must be removed from Developer.
+     * @param <ID> - generic type that allow to pass to the method only extends Number's type.
+     * @return - Developer with changed data, if data wasn't changed returns null.
      */
     public <ID extends Number>  Developer removeSkillFromDeveloper(ID skillId) {
         try {
@@ -164,9 +193,8 @@ public class DeveloperController {
         return null;
     }
 
-    /**
-     * removes all Skills from Developer
-     * @return
+    /** Method removes all skills from current developer and write changed data to repository file
+     * @return - Developer with changes.
      */
     public Developer removeAllSkillsFromDeveloper() {
         if (current.getSkills().size() == 0)
@@ -177,9 +205,13 @@ public class DeveloperController {
     }
 
     /**
-     * removes one skill from all developers
-     * @param skill
-     * @return
+     * Accepts object of Skill type that must be removed from all existing developers.
+     * Firstly call method findAll() of DeveloperRepository class and get Collection with all existing developers.
+     * Then with loop compare whether this object is present for current developer or not, if it is present
+     * temp int counter increments by 1 and the found objects removes from current developer. In the end new data will
+     * be written to repository file.
+     * @param skill - object of Skill type that must be removed from all developers.
+     * @return - quantity of developers from whose skill was removed.
      */
     public int removeSkillFromAll(Skill skill) {
         int counter = 0;
@@ -200,9 +232,10 @@ public class DeveloperController {
     }
 
     /**
-     * accept key word for searching similar word in skill names
-     * if this ward was found - Developer object will be added to List
-     * @param keyWord - key word
+     * Accepts key word for searching similar word in skill names for all existing developers.
+     * Firstly gets collection of Developers by findAll() method. Then in loop gets Set<Skill> for each developer
+     * and check each skill name whether name contains incoming key string or not, if contains adds this Developer to List<Developer>
+     * @param keyWord - key word for searching
      * @return - collection of Developer
      */
     public List<Developer> showDevelopersWithKeySkillWord(String keyWord) {
@@ -222,7 +255,6 @@ public class DeveloperController {
                             break;
                         }
                     }
-
                 }
             }
             return result;
@@ -262,32 +294,6 @@ public class DeveloperController {
         }
         return null;
     }
-
-//    private Developer developerBuilder(Developer developer) {
-//
-//        if (developer.getNumbersOfSkills().contains(",")) {
-//            SkillController skillController = new SkillController();
-//            String[] skillNumbers = developer.getNumbersOfSkills().split(",");
-//            try {
-//                Map<Long, Skill> allSkills = skillController.allSkills();
-//                for (int i = 0; i < skillNumbers.length; i++) {
-//                    Long skillId = Long.parseLong(skillNumbers[i]);
-//                    Skill skill = allSkills.get(skillId);
-//                    developer.addSkill(skill);
-//                }
-//            } catch (ReadFileException e) {
-//                System.out.println("Не удалось прочитать навыки из базы " + e.getMessage());
-//            }
-//        }
-//
-//        AccountController accountController = new AccountController();
-//        Account account = accountController.getAccount(developer.getId());
-//        if (account == null) {
-//            return null;
-//        }
-//        developer.setAccount(account);
-//        return developer;
-//    }
 
     private boolean checkDevName(String name) {
         String tmp = name.trim();

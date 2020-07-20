@@ -18,9 +18,6 @@ public class Skill {
     public String getSkillName() {
         return skillName;
     }
-    public void setSkillName(String skillName) {
-        this.skillName = skillName;
-    }
     public void setID(Long ID) {
         this.id = ID;
     }

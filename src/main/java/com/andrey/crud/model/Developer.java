@@ -57,19 +57,12 @@ public class Developer {
     public int getAge() {
         return age;
     }
-    public Account getAccount() {
-        return account;
-    }
 
     public Set<Skill> getSkills() {
         return skills;
     }
     public void setSkills(Set<Skill> skills) {
         this.skills = skills;
-    }
-
-    public void addSkill(Skill skill) {
-        skills.add(skill);
     }
 
     @Override

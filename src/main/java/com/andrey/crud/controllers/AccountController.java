@@ -36,7 +36,8 @@ public class AccountController {
     }
 
     /**
-     * method creates Account, first of all the accountName is checked
+     * Accepts string that will be checked by method checkAccountName()
+     * and if this method will return true a new account will be created
      * if method checkAccountName return false this method return null
      * @param accountName - name of Account that must be created
      * @return - created new object of Account type, may return null
@@ -56,7 +57,12 @@ public class AccountController {
         return null;
     }
 
-
+    /**
+     * accepts int value that is id. Then this id is casted to long and
+     * method delete() of AccountRepository will be called and if this id
+     * is present in the repository file - the account will be deleted from repository
+     * @param id - id of account that must be deleted
+     */
     public void deleteAccount(int id) {
         try {
             repository.delete((long) id);

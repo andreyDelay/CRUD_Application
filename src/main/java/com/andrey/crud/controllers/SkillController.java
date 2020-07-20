@@ -7,7 +7,6 @@ import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.IO.SkillsRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class SkillController {
@@ -15,6 +14,14 @@ public class SkillController {
     private SkillsRepository repository = new SkillsRepository();
     private Skill current;
 
+    /**
+     * Accepts id of Number type and tries to get object by this id from repository file
+     * and if the object is present into repo file calls method removeSkillFromAll() of DeveloperController class,
+     * then writes changed data to repository file.
+     * @param skillId - id of Skill that must be removed from all existing developers and from repository file.
+     * @param <ID> - generic type that allow to pass to the method only extends Number's type.
+     * @return - quantity of developers from whose skill was removed.
+     */
     public<ID extends Number> int removeSkillFromAll(ID skillId) {
         int index = 0;
         try {
@@ -32,6 +39,14 @@ public class SkillController {
         return index;
     }
 
+    /**
+     * Accepts a string name for creating a new Skill object. If method checkSkillName() returns true
+     * all skills' names will be compared with incoming value for matching. If skill with same name was found
+     * this value will be return and new object won't be created, otherwise a new Skill object will be created
+     * and returned.
+     * @param name - name for new Skill object
+     * @return - old value if some skill already has such name, otherwise a new Skill object
+     */
     public Skill saveSkill(String name) {
         try {
             if (!checkSkillName(name))
@@ -55,6 +70,12 @@ public class SkillController {
         return null;
     }
 
+    /**
+     * Method calls findAll() of SkillsRepository class,  to get a collection with all existing skills
+     * and represent this collection as String with all the data. If collection if empty it returns null
+     * and print out "В базе нет навыков".
+     * @return - String representation of all existing skills.
+     */
     public String showAllSkills() {
         try {
             List<Skill> skills = repository.findAll();
@@ -72,10 +93,6 @@ public class SkillController {
             System.out.println("Ошибка чтения базы данных." + e.getMessage());
         }
        return null;
-    }
-
-    public List<Skill> allSkills() throws ReadFileException {
-        return repository.findAll();
     }
 
     private boolean checkSkillName(String name) {
