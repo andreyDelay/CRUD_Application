@@ -6,3 +6,7 @@
 	id:=2
 	name:=dancing all night
 }
+{
+	id:=3
+	name:=fill Readmi.md file with shot app description
+}
