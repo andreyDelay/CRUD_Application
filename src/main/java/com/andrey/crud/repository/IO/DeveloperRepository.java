@@ -107,8 +107,10 @@ public class DeveloperRepository implements DeveloperIORepository {
             index ++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                for (int i = 0; i < 7; i++)
-                    rowsFromRepo.remove(index -1);
+                int rowsToRemoveFromRepo = 7;
+                for (int i = 0; i < rowsToRemoveFromRepo; i++) {
+                    rowsFromRepo.remove(index - 1);
+                }
 
                 String dataToWrite = String.join("", rowsFromRepo);
                 IOUtils.writeFile(dataToWrite, filepath,StandardOpenOption.TRUNCATE_EXISTING);
@@ -133,8 +135,10 @@ public class DeveloperRepository implements DeveloperIORepository {
                         .append("\t").append("age:=").append(newDeveloper.getAge()).append("\n")
                         .append("\t").append(numbersOfSkills(newDeveloper)).append("\n")
                         .append("}").append("\n");
-        for (int i = 0; i < 4; i++)
+        int rowsToRemoveFromRepo = 4;
+        for (int i = 0; i < rowsToRemoveFromRepo; i++) {
             allData.remove(index);
+        }
 
         allData.set(index, newDataForOneLine.toString());
     }

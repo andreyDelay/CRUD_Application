@@ -9,8 +9,10 @@ import com.andrey.crud.utils.IOUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SkillsRepository implements SkillIORepository {
@@ -117,8 +119,10 @@ public class SkillsRepository implements SkillIORepository {
             index++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                for (int i = 0; i < 4; i++)
+                int rowsToRemoveFromRepo = 4;
+                for (int i = 0; i < rowsToRemoveFromRepo; i++) {
                     rowsFromRepo.remove(index - 2);
+                }
 
                 String dataToWrite = String.join("\n",rowsFromRepo);
                 IOUtils.writeFile(dataToWrite,filepath,StandardOpenOption.TRUNCATE_EXISTING);

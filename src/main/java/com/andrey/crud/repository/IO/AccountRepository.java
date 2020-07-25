@@ -4,14 +4,16 @@ import com.andrey.crud.exeptions.ReadFileException;
 import com.andrey.crud.exeptions.WriteFileException;
 import com.andrey.crud.model.Account;
 import com.andrey.crud.model.AccountStatus;
-import com.andrey.crud.model.Skill;
 import com.andrey.crud.repository.AccountIORepository;
 import com.andrey.crud.utils.IOUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AccountRepository implements AccountIORepository<Account> {
@@ -20,7 +22,16 @@ public class AccountRepository implements AccountIORepository<Account> {
 
     private final String separator = "=";
 
-
+    /**
+     * Method accepts an object of Account type and calls method from IOUtils class generateID()
+     * to det id for a new Account before saving. Then calls private method of this class objectToRepositoryFormat()
+     * the method represents the object as string value. Finally this objects will be passed to IOUtils.writeFile()
+     * for saving into repo file.
+     * @param account - new object that must be saved
+     * @return - the same object with id number
+     * @throws WriteFileException - if repo file cannot be created or if the file is not available for writing.
+     * @throws ReadFileException - if repo file cannot be opened or if the file is not available for reading.
+     */
     @Override
     public Account save(Account account) throws WriteFileException, ReadFileException {
         account.setId(IOUtils.generateID(filepath,separator));
@@ -98,8 +109,10 @@ public class AccountRepository implements AccountIORepository<Account> {
             index++;
             currentLine = iterator.next().trim();
             if (currentLine.contains("id:") && checkId(currentLine, String.valueOf(id))) {
-                for (int i = 0; i < 5; i++)
-                    fromRepository.remove(index -1);
+                int rowsToRemoveFromRepo = 5;
+                for (int i = 0; i < rowsToRemoveFromRepo; i++) {
+                    fromRepository.remove(index - 1);
+                }
 
 
                 String dataToWrite = String.join("\n",fromRepository);
@@ -115,8 +128,10 @@ public class AccountRepository implements AccountIORepository<Account> {
                 .append("\t").append("status:=").append(newValue.getStatus().toString()).append("\n")
                 .append("}")
                 .append("\n");
-        for (int i = 0; i < 2; i++)
+        int rowsToRemoveFromRepo = 2;
+        for (int i = 0; i < rowsToRemoveFromRepo; i++) {
             rows.remove(index);
+        }
 
         rows.set(index, newData.toString());
     }
